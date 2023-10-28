@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { Space, Table, Divider, Row, Col, Spin, message, Button } from 'antd';
 import Header from "../Layout/header"
 import FooterBar from "../Layout/footer"
@@ -7,6 +6,8 @@ import FooterBar from "../Layout/footer"
 import { useQuery } from "react-query";
 
 import {PERSON_LIST_ADMIN_API} from "@api";
+
+import { MutationFetch } from '../../Helpers/mutation'
 
 const columns = [
     {
@@ -56,7 +57,7 @@ const AdminPersonList = () => {
     const {isLoading} = useQuery({
         queryKey: ['fetchPersonList', page],
         queryFn: () =>
-            axios.get(PERSON_LIST_ADMIN_API, {
+            MutationFetch(PERSON_LIST_ADMIN_API, {
                 page: page,
                 length: 10,
             }),

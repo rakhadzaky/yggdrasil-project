@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\URL;
 
 class PersonsController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function FetchFamilyByPersonId($pid) {
         $familliesTree = array();
 

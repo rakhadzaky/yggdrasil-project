@@ -18,6 +18,11 @@ use DateTime;
 
 class AdminPersonController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     public function FetchAllPersonData(Request $request) {
         $validator = Validator::make($request->all(), [
             'search'    => 'regex:/^[a-z\d\-_\s]+$/i|nullable',

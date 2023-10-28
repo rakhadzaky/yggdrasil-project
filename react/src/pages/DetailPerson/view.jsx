@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Descriptions, Image, Divider, Row, Col, Spin, Breadcrumb, Typography } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import Header from "../Layout/header"
 import FooterBar from "../Layout/footer"
 import {useParams} from "react-router-dom";
 import { BACKEND_BASE_URL, PERSON_DETAIL_API } from '@api';
+
+import { MutationFetch } from '../Helpers/mutation'
 
 const DetailPerson = () => {
     const [person, setPerson] = useState({});
@@ -16,7 +17,7 @@ const DetailPerson = () => {
     const BASE_URL = location.protocol + '//' + location.host;
 
     useEffect(() => {
-        axios.get(`${PERSON_DETAIL_API}/${pid}`)
+        MutationFetch(`${PERSON_DETAIL_API}/${pid}`)
             .then(response => {
                 setPerson(response.data.data);
                 setIsLoading(false);
