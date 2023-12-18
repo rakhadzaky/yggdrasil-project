@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Spin, message } from 'antd';
+import { Spin } from 'antd';
 
 import HeaderBar from "../Layout/header"
 import FooterBar from "../Layout/footer"
 
 import GraphTree from './Components/GraphTree/view'
 import { MutationFetch } from '../Helpers/mutation'
+import useHandleError from '../Helpers/handleError'
 
 import {useParams} from "react-router-dom";
 
 import { PERSON_FAMILY_TREE_API } from '@api';
 
 const View = () => {
-    const [messageApi, contextHolder] = message.useMessage();
-
     const BASE_URL = location.protocol + '//' + location.host;
     const [nodes, setNodes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { handleError } = useHandleError();
 
     const {pid} = useParams()
 
@@ -27,10 +27,7 @@ const View = () => {
                 setIsLoading(false);
             })
             .catch(error => {
-                messageApi.open({
-                    type: 'error',
-                    content: error.response.data.message,
-                });
+                handleError(error);
                 setIsLoading(false);
             });
     }, []);
@@ -48,7 +45,6 @@ const View = () => {
     if (isLoading) {
         return (
             <>
-                {contextHolder}
                 <HeaderBar />
                 <div style={{margin: "20px 0", marginBottom: "20px", padding: "30px 50px", textAlign: "center", minHeight: '90vh'}}>
                     <Spin />
@@ -60,7 +56,6 @@ const View = () => {
 
     return (
         <>
-            {contextHolder}
             <HeaderBar />
             <GraphTree nodes={nodes} />
             <FooterBar />
