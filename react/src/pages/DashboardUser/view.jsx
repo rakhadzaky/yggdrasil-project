@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Spin, message } from 'antd';
 
-import Header from "../Layout/header"
+import HeaderBar from "../Layout/header"
 import FooterBar from "../Layout/footer"
 
 import GraphTree from './Components/GraphTree/view'
@@ -49,7 +49,7 @@ const View = () => {
         return (
             <>
                 {contextHolder}
-                <Header />
+                <HeaderBar />
                 <div style={{margin: "20px 0", marginBottom: "20px", padding: "30px 50px", textAlign: "center", minHeight: '90vh'}}>
                     <Spin />
                 </div>
@@ -61,7 +61,7 @@ const View = () => {
     return (
         <>
             {contextHolder}
-            <Header />
+            <HeaderBar />
             <GraphTree nodes={nodes} />
             <FooterBar />
         </>

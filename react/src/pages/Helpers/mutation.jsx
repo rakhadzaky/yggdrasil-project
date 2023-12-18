@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { message } from 'antd';
 
 export const MutationFetch = (apiURL, params) => {
     const authorisationData = JSON.parse(localStorage.getItem("token"));
@@ -20,4 +21,23 @@ export const MutationFetch = (apiURL, params) => {
             ...params
         }
     })
+}
+
+export const HandleError = (error) => {
+    const [messageApi] = message.useMessage();
+
+    const errorCode = error.response.status
+
+    console.log(error)
+    if (errorCode === 401) {
+        return messageApi.open({
+            type: 'error',
+            content: 'Unauthorize',
+        });
+    } else {
+        return messageApi.open({
+            type: 'error',
+            content: error.response.data.message,
+        });
+    }
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PersonsController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminPersonController;
+use App\Http\Controllers\SuperAdminPersonController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,7 +37,9 @@ Route::post('/person/search', [AuthController::class, 'CheckPersonLogName'])->na
 
 
 // AdminPerson
-Route::get('/admin/person', [AdminPersonController::class, 'FetchAllPersonData'])->name('admin_fetch_person');
-Route::post('/admin/person', [AdminPersonController::class, 'AddNewPerson'])->name('admin_add_person');
-Route::post('/admin/person/delete', [AdminPersonController::class, 'DeletePerson'])->name('admin.delete_person');
-Route::post('/admin/person/update/{pid}', [AdminPersonController::class, 'UpdatePerson'])->name('admin.update_person');
+Route::get('/admin/person', [SuperAdminPersonController::class, 'FetchAllPersonData'])->name('admin_fetch_person');
+Route::get('/admin/person/{pid}', [SuperAdminPersonController::class, 'GetPersonDetail'])->name('admin_fetch_detail_person');
+Route::get('/admin/headfamily', [SuperAdminPersonController::class, 'FetchAllHeadFamilyData'])->name('admin_fetch_headfamily');
+Route::post('/admin/person', [SuperAdminPersonController::class, 'AddNewPerson'])->name('admin_add_person');
+Route::post('/admin/person/delete', [SuperAdminPersonController::class, 'DeletePerson'])->name('admin_delete_person');
+Route::post('/admin/person/update/{pid}', [SuperAdminPersonController::class, 'UpdatePerson'])->name('admin_update_person');

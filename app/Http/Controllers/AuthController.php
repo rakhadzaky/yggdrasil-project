@@ -6,9 +6,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Exception\ClientException;
+
 
 use App\Models\Persons;
 use App\Models\User;
+use JWTAuth;
 
 class AuthController extends Controller
 {
@@ -17,15 +21,41 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login','register']]);
     }
 
+    public function hitAPI($method, $url) {
+        $client = new GuzzleClient();
+        try {
+            $res = $client->get($url);
+        } catch (ClientException $e) {
+            return false;
+        }
+
+        return json_decode($res->getBody()->getContents());
+    }
+
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|string|email',
-            'password' => 'required|string',
+            'access_token' => 'required|string',
         ]);
-        $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
+        $url = "https://www.googleapis.com/oauth2/v3/userinfo?access_token=".$request->access_token."";
+        $googleUserInfo = $this->hitAPI("GET", $url);
+        if ($googleUserInfo == false) {
+            return response()->json([
+                'status' => "Failed to login",
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        $user = User::where("email", $googleUserInfo->email)->first();
+        if ($user == null) {
+            return response()->json([
+                'status' => "user doesn't exists",
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        $token = JWTAuth::fromUser($user);
         if (!$token) {
             return response()->json([
                 'status' => 'error',
@@ -33,7 +63,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $user = Auth::user();
         return response()->json([
                 'status' => 'success',
                 'user' => $user,

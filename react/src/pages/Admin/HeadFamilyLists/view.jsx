@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { Space, Table, Row, Col, Spin, Button, Breadcrumb, Input,Tag } from 'antd';
+import { Space, Table, Row, Col, Spin, Button, Breadcrumb } from 'antd';
 import CompleteLayout from "../Layout/CompleteLayout"
 
 import { useQuery } from "react-query";
 
-import {PERSON_LIST_ADMIN_API} from "@api";
+import {HEAD_FAMILY_LIST_ADMIN_API} from "@api";
 
 import { MutationFetch, HandleError } from '../../Helpers/mutation'
-
-const { Search } = Input;
 
 const columns = [
     {
@@ -33,29 +31,17 @@ const columns = [
         key: 'live_loc',
     },
     {
-        title: 'Relation',
-        dataIndex: 'relation',
-        key: 'relation',
-        render: (record, index) => {
-            if (index.pid !== null) {
-                return(
-                    <Tag color="success">Have relation</Tag>
-                )
-            } else {
-                return(
-                    <Tag color="error">Does not Have relation</Tag>
-                )
-            }
-        },
+        title: 'Total Members',
+        dataIndex: 'total_member',
+        key: 'total_member'
     },
     {
         title: 'Action',
         key: 'action',
         fixed: 'right',
-        render: (record, index) => {
+        render: () => {
             return(
                 <Space>
-                    <Button type='primary' href={`${BASE_URL}/admin/person/relation/${index.id}`} ghost>Update Relation</Button>
                     <Button type='primary' ghost>Edit</Button>
                     <Button danger>Delete</Button>
                 </Space>
@@ -66,16 +52,14 @@ const columns = [
 
 const BASE_URL = location.protocol + '//' + location.host;
 
-const AdminPersonList = () => {
+const AdminHeadFamilyList = () => {
     const [person, setPerson] = useState({});
     const [page, setPage] = useState(1);
-    const [search, setSearch] = useState("");
 
-    const {isLoading, refetch} = useQuery({
+    const {isLoading} = useQuery({
         queryKey: ['fetchPersonList', page],
         queryFn: () =>
-            MutationFetch(PERSON_LIST_ADMIN_API, {
-                search: search,
+            MutationFetch(HEAD_FAMILY_LIST_ADMIN_API, {
                 page: page,
                 length: 10,
             }),
@@ -99,26 +83,17 @@ const AdminPersonList = () => {
 
     return(
         <CompleteLayout>
-            <div style={{padding:'0 20px 20px 0'}}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>Person</Breadcrumb.Item>
-                    <Breadcrumb.Item>All Person List</Breadcrumb.Item>
-                </Breadcrumb>
+            <div style={{textAlign:'right', padding:'0 20px 20px 0'}}>
                 <Row>
                     <Col span={12}>
-                        <Search
-                            placeholder="Search Persons"
-                            value={search}
-                            onChange={(e) => {setSearch(e.target.value)}}
-                            onSearch={refetch}
-                            style={{
-                                width: 200,
-                            }}
-                        />
+                        <Breadcrumb style={{ margin: '16px 0' }}>
+                            <Breadcrumb.Item>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item>Person</Breadcrumb.Item>
+                            <Breadcrumb.Item>All Head of Family List</Breadcrumb.Item>
+                        </Breadcrumb>
                     </Col>
-                    <Col span={12} style={{textAlign:'right', }}>
-                        <Button type='primary' href={`${BASE_URL}/admin/person/add`}>Add Person</Button>
+                    <Col span={12}>
+                        <Button type='primary' href={`${BASE_URL}/admin/add`}>Add Person</Button>
                     </Col>
                 </Row>
             </div>
@@ -138,4 +113,4 @@ const AdminPersonList = () => {
         </CompleteLayout>
     )
 };
-export default AdminPersonList;
+export default AdminHeadFamilyList;

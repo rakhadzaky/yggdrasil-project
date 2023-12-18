@@ -4,6 +4,8 @@ import DashboardUser from "./pages/DashboardUser/view"
 import DetailPerson from "./pages/DetailPerson/view"
 import AdminPersonList from "./pages/Admin/PersonLists/view"
 import AdminPersonAdd from "./pages/Admin/PersonAdd/view"
+import AdminHeadFamilyList from "./pages/Admin/HeadFamilyLists/view"
+import AdminRelationForm from "./pages/Admin/PersonRelation/view"
 
 const router = createBrowserRouter([
     {
@@ -22,12 +24,20 @@ const router = createBrowserRouter([
         path: '/admin',
         children: [
             {
-                path: '',
+                path: 'person/all-list',
                 element: <AdminPersonList />,
             },
             {
-                path: 'add',
+                path: 'person/add',
                 element: <AdminPersonAdd />,
+            },
+            {
+                path: 'head-of-family/all-list',
+                element: <AdminHeadFamilyList />,
+            },
+            {
+                path: 'person/relation/:pid',
+                element: <AdminRelationForm />
             }
         ]
     }
