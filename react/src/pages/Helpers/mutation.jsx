@@ -1,8 +1,12 @@
 import axios from 'axios';
-import { message } from 'antd';
+import Cookies from 'js-cookie';
+
+const BASE_URL = location.protocol + '//' + location.host;
+
 
 export const MutationFetch = (apiURL, params) => {
-    const authorisationData = JSON.parse(localStorage.getItem("token"));
+    const authorisationData = HandleGetCookies("token", true);
+
     if (authorisationData === null) {
         window.location.href = `/`
         return
@@ -24,20 +28,26 @@ export const MutationFetch = (apiURL, params) => {
 }
 
 export const HandleError = (error) => {
-    const [messageApi] = message.useMessage();
-
     const errorCode = error.response.status
 
     console.log(error)
     if (errorCode === 401) {
-        return messageApi.open({
-            type: 'error',
-            content: 'Unauthorize',
-        });
+        window.location.href = `${BASE_URL}`
     } else {
-        return messageApi.open({
-            type: 'error',
-            content: error.response.data.message,
-        });
+        window.location.href = `${BASE_URL}`
     }
+
+    return 
+}
+
+export const HandleGetCookies = (cookiesName, logoutOnError) => {
+    const cookiesData = Cookies.get(cookiesName);
+    console.log(cookiesData === null);
+    if (cookiesData == null && logoutOnError) {
+        console.log("Unauthorize")
+        return false
+    }
+    const decodeData = JSON.parse(cookiesData);
+
+    return decodeData
 }

@@ -49,10 +49,18 @@ class AuthController extends Controller
 
         $user = User::where("email", $googleUserInfo->email)->first();
         if ($user == null) {
-            return response()->json([
-                'status' => "user doesn't exists",
-                'message' => 'Unauthorized',
-            ], 401);
+            // if user doesn't exists then create the new one
+            $user = User::create([
+                'name' => $googleUserInfo->name,
+                'email' => $googleUserInfo->email,
+                'profile_pict' => $googleUserInfo->picture,
+            ]);
+        }
+
+        // update profile pict if the profile pict changed or doesn't exists
+        if ($user->profile_pict == null || $user->profile_pict != $googleUserInfo->picture) {
+            $user->profile_pict = $googleUserInfo->picture;
+            $user->save();
         }
 
         $token = JWTAuth::fromUser($user);

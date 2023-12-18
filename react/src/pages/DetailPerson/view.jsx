@@ -5,6 +5,8 @@ import HeaderBar from "../Layout/header"
 import FooterBar from "../Layout/footer"
 import {useParams} from "react-router-dom";
 import { BACKEND_BASE_URL, PERSON_DETAIL_API } from '@api';
+import { HandleGetCookies } from '../Helpers/mutation'
+import useHandleError from '../Helpers/handleError'
 
 import { MutationFetch } from '../Helpers/mutation'
 
@@ -13,11 +15,12 @@ const DetailPerson = () => {
     const [family, setFamily] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const { Title } = Typography
+    const { handleError } = useHandleError();
 
     const {pid} = useParams()
     const BASE_URL = location.protocol + '//' + location.host;
 
-    const authorisationData = JSON.parse(localStorage.getItem("token"));
+    const authorisationData = HandleGetCookies("token", true);
     const userPID = authorisationData.pid;
 
     useEffect(() => {
@@ -30,8 +33,7 @@ const DetailPerson = () => {
                 setIsLoading(false);
             })
             .catch(error => {
-                console.error(error);
-                console.error(error.response.data);
+                handleError(error);
             });
     }, []);
 
