@@ -2,20 +2,13 @@ import { PlusOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import {
     Button,
-    Cascader,
-    Checkbox,
     DatePicker,
     Form,
     Input,
-    InputNumber,
     Radio,
-    Select,
-    Slider,
     Switch,
-    TreeSelect,
     Upload,
 } from 'antd';
-const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const normFile = (e) => {
     if (Array.isArray(e)) {
@@ -38,27 +31,24 @@ const FormDisabledDemo = () => {
         <>
         <Form
             labelCol={{
-            span: 4,
+            span: 6,
             }}
             wrapperCol={{
-            span: 14,
+            span: 12,
             }}
             layout="horizontal"
-            style={{
-            maxWidth: 600,
-            }}
             onFinish={handleOnFinishForm}
         >
             <Form.Item label="Name" name="name">
                 <Input />
             </Form.Item>
-            <Form.Item label="Radio" name="gender">
+            <Form.Item label="Gender" name="gender">
                 <Radio.Group>
                     <Radio value="male"> Male </Radio>
                     <Radio value="female"> Female </Radio>
                 </Radio.Group>
             </Form.Item>
-            <Form.Item label="DatePicker" name="birthdate">
+            <Form.Item label="Birthdate" name="birthdate">
                 <DatePicker />
             </Form.Item>
             <Form.Item label="Use Image File" name="switchImage" valuePropName="checked">
@@ -84,15 +74,24 @@ const FormDisabledDemo = () => {
                     <Input />
                 </Form.Item>
             )}
-            <Form.Item label="Live Location" name="live_loc">
-                <Input />
+            <Form.Item label="Residence Location" name="live_loc">
+                <TextArea />
             </Form.Item>
             <Form.Item label="Phone" name="phone">
                 <Input />
-            </Form.Item>            
-            
-            <Form.Item>
-                <Button type="primary" htmlType='submit'>Button</Button>
+            </Form.Item>           
+            <Form.Item
+                wrapperCol={{
+                offset: 8,
+                span: 16,
+                }}
+                style={{
+                    marginTop: '8px'
+                }}
+            >
+                <Button type="primary" style={{float: 'right'}} htmlType="submit">
+                Add Person
+                </Button>
             </Form.Item>
         </Form>
         </>

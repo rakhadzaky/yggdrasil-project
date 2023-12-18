@@ -10,6 +10,9 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 // Bootstrap Bundle JS
 import "bootstrap/dist/js/bootstrap.bundle.min";
 
+// Bringing in the GoogleOAuthProvider from the package
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 const queryClient = new QueryClient({
@@ -22,8 +25,10 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId="767745412305-nf0ir6rj1q2qqo016nosnugq9q66u9g8.apps.googleusercontent.com">
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>
 )

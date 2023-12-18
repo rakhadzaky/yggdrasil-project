@@ -9,8 +9,6 @@ use App\Models\PersonRelations;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 
-
-
 class PersonsController extends Controller
 {
     public function __construct()
@@ -308,6 +306,19 @@ class PersonsController extends Controller
                 'data' => null,
                 'message' => 'Data not found'
             ], 404);
+        }
+
+        $personRelation = PersonRelations::where('pid', '=', $pid)->first();
+        
+        if ($personRelation != null) {
+            $relationData = [
+                "father" => $personRelation->fatherPerson,
+                "mother" => $personRelation->motherPerson,
+            ];
+
+            $person->family = $relationData;
+        } else {
+            $person->family = null;
         }
 
         return response([

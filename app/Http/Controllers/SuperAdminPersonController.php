@@ -16,13 +16,79 @@ use Image;
 use DateTime;
 
 
-class AdminPersonController extends Controller
+class SuperAdminPersonController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth:api');
     }
 
+    public function FetchAllHeadFamilyData(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'search'    => 'regex:/^[a-z\d\-_\s]+$/i|nullable',
+            'gender'    => 'alpha|nullable',
+            'page'      => 'numeric|nullable',
+            'length'    => 'numeric|nullable',
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        $search = $request->input('search');
+        $gender = $request->input('gender');
+
+        $page = $request->input('page');
+        $length = $request->input('length');
+
+        $pagination = [$page, $length];
+
+        $fetchPersonQuery = DB::table('persons_relations')
+        ->select('persons_relations.hfid', DB::raw('count(persons_relations.hfid) as total_member'), 'persons.*')
+        ->join('persons','persons.id', '=', 'persons_relations.hfid')
+        ->groupBy('persons_relations.hfid')
+        ->when($search, function ($query, $search) {
+            return $query->having('name', 'LIKE', '%'.$search.'%');
+        })
+        ->when($gender, function ($query, $gender) {
+            return $query->having('gender', $gender);
+        });
+
+        $fetchPersonTotal = $fetchPersonQuery->count();
+
+        $fetchPerson = $fetchPersonQuery
+            ->when($pagination, function ($query, $pagination) {
+                $pageNum = $pagination[0];
+                $lengthLimit = $pagination[1];
+                if ($pageNum > 0 && $lengthLimit > 0) {
+                    return $query->skip($lengthLimit * ($pageNum - 1))->take($lengthLimit);
+                }
+            })
+            ->get();
+
+        if (!$fetchPerson) {
+            return response([
+                'success' => true,
+                'data' => [],
+                'page' => intval($page),
+                'total' => 0,
+            ], 200);
+        }
+
+        foreach ($fetchPerson as $key => $person) {
+            $fetchPerson[$key]->age = Carbon::parse($person->birthdate)->age;
+        }
+
+        return response([
+            'success' => true,
+            'data' => $fetchPerson,
+            'page' => intval($page),
+            'total' => $fetchPersonTotal,
+        ], 200);
+    }
+    
     public function FetchAllPersonData(Request $request) {
         $validator = Validator::make($request->all(), [
             'search'    => 'regex:/^[a-z\d\-_\s]+$/i|nullable',
@@ -46,6 +112,8 @@ class AdminPersonController extends Controller
         $pagination = [$page, $length];
 
         $fetchPersonQuery = DB::table('persons')
+        ->select('persons.*', 'persons_relations.pid')
+        ->leftjoin('persons_relations','persons.id', '=', 'persons_relations.pid')
         ->when($search, function ($query, $search) {
             return $query->where('name', 'LIKE', '%'.$search.'%');
         })
@@ -263,6 +331,35 @@ class AdminPersonController extends Controller
 
         return response([
             'success' => true,
+        ], 200);
+    }
+
+    public function GetPersonDetail(Request $request, $pid) {
+        $person = Persons::find($pid);
+        if (!$person) {
+            return response([
+                'success' => false,
+                'data' => null,
+                'message' => 'Data not found'
+            ], 404);
+        }
+
+        $personRelation = PersonRelations::where('pid', '=', $pid)->first();
+        
+        if ($personRelation != null) {
+            $relationData = [
+                "father" => $personRelation->fatherPerson,
+                "mother" => $personRelation->motherPerson,
+            ];
+
+            $person->family = $relationData;
+        } else {
+            $person->family = null;
+        }
+
+        return response([
+            'success' => true,
+            'data' => $person
         ], 200);
     }
 }

@@ -15,7 +15,7 @@ const items = [
     }
   ];
 
-const Header = () => {
+const HeaderBar = () => {
     const [current, setCurrent] = useState('mail');
     const onClick = (e) => {
         console.log('click ', e);
@@ -28,4 +28,4 @@ const Header = () => {
         </>
     );
 };
-export default Header;
+export default HeaderBar;
