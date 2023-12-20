@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Login from "./pages/login"
 import DashboardUser from "./pages/DashboardUser/view"
+import PreDashboardUser from "./pages/PreDashboardUser/view";
 import DetailPerson from "./pages/DetailPerson/view"
 import AdminPersonList from "./pages/Admin/PersonLists/view"
 import AdminPersonAdd from "./pages/Admin/PersonAdd/view"
@@ -15,6 +16,10 @@ const router = createBrowserRouter([
     {
         path: '/dashboard/:pid',
         element: <DashboardUser />
+    },
+    {
+        path: '/pre/dashboard',
+        element: <PreDashboardUser />,
     },
     {
         path: '/person/:pid',

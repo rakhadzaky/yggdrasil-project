@@ -12,7 +12,6 @@ use GuzzleHttp\Exception\ClientException;
 
 use App\Models\Persons;
 use App\Models\User;
-use JWTAuth;
 
 class AuthController extends Controller
 {
@@ -63,7 +62,7 @@ class AuthController extends Controller
             $user->save();
         }
 
-        $token = JWTAuth::fromUser($user);
+        $token = Auth::fromUser($user);
         if (!$token) {
             return response()->json([
                 'status' => 'error',

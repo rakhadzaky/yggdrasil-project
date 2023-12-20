@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
 use App\Models\Persons;
+use App\Models\RolesUser;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -62,6 +63,9 @@ class User extends Authenticatable implements JWTSubject
     {
         $userData = $this;
         $userData->person = $this->person;
+        foreach ($userData->rolesUser as $usersRole) {
+            $usersRole->role;
+        }
         return [
             'user' => $userData,
         ];
@@ -75,4 +79,11 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Persons::class, 'user_id', 'id');
     }
 
+    /**
+     * Get the roles data associated with the user.
+     */
+    public function rolesUser()
+    {
+        return $this->hasMany(RolesUser::class, 'user_id', 'id');
+    }
 }
