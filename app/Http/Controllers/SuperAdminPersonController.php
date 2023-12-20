@@ -21,6 +21,7 @@ class SuperAdminPersonController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
+        $this->middleware('roleCheck:super_admin');
     }
 
     public function FetchAllHeadFamilyData(Request $request) {

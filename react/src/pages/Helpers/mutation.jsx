@@ -30,7 +30,6 @@ export const MutationFetch = (apiURL, params) => {
 export const HandleError = (error) => {
     const errorCode = error.response.status
 
-    console.log(error)
     if (errorCode === 401) {
         window.location.href = `${BASE_URL}`
     } else {
@@ -42,9 +41,7 @@ export const HandleError = (error) => {
 
 export const HandleGetCookies = (cookiesName, logoutOnError) => {
     const cookiesData = Cookies.get(cookiesName);
-    console.log(cookiesData === null);
     if (cookiesData == null && logoutOnError) {
-        console.log("Unauthorize")
         return false
     }
     const decodeData = JSON.parse(cookiesData);

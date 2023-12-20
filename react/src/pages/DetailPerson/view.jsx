@@ -20,8 +20,8 @@ const DetailPerson = () => {
     const {pid} = useParams()
     const BASE_URL = location.protocol + '//' + location.host;
 
-    const authorisationData = HandleGetCookies("token", true);
-    const userPID = authorisationData.pid;
+    const userData = HandleGetCookies("userData", true);
+    const userPID = userData.person_id;
 
     useEffect(() => {
         MutationFetch(`${PERSON_DETAIL_API}/${pid}`)
