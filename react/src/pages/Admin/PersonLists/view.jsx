@@ -6,7 +6,8 @@ import { useQuery } from "react-query";
 
 import {PERSON_LIST_ADMIN_API} from "@api";
 
-import { MutationFetch, HandleError } from '../../Helpers/mutation'
+import { MutationFetch } from '../../Helpers/mutation'
+import useHandleError from '../../Helpers/handleError'
 
 const { Search } = Input;
 
@@ -70,6 +71,8 @@ const AdminPersonList = () => {
     const [person, setPerson] = useState({});
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState("");
+    const [tableLoading, setTableLoading] = useState(false);
+    const { handleError } = useHandleError();
 
     const {isLoading, refetch} = useQuery({
         queryKey: ['fetchPersonList', page],
@@ -80,12 +83,18 @@ const AdminPersonList = () => {
                 length: 10,
             }),
         onError: (error) => {
-            console.log(error.response.status)
-            HandleError(error)
+            handleError(error);
         },
-        onSuccess: (response) => 
-            setPerson(response.data.data),
+        onSuccess: (response) => {
+            setPerson(response.data.data)
+            setTableLoading(false)
+        }
     })
+
+    const searchData = () => {
+        setTableLoading(true)
+        refetch()
+    }
 
     if (isLoading) {
         return (
@@ -111,7 +120,7 @@ const AdminPersonList = () => {
                             placeholder="Search Persons"
                             value={search}
                             onChange={(e) => {setSearch(e.target.value)}}
-                            onSearch={refetch}
+                            onSearch={searchData}
                             style={{
                                 width: 200,
                             }}
@@ -132,6 +141,7 @@ const AdminPersonList = () => {
                         setPage(page)
                     }
                 }}
+                loading={tableLoading}
                 size="middle"
                 scroll={{ x: 'calc(700px + 50%)' }}
             />

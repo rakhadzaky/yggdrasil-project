@@ -1,5 +1,8 @@
 import {UserOutlined, SettingOutlined} from '@ant-design/icons';
-import {Menu} from 'antd';
+import {Menu, App} from 'antd';
+import Cookies from 'js-cookie';
+import { useNavigate } from "react-router-dom";
+
 function getItem(label, key, icon, children, type) {
     return {
         key,
@@ -9,6 +12,7 @@ function getItem(label, key, icon, children, type) {
         type
     };
 }
+
 const BASE_URL = location.protocol + '//' + location.host;
 const items = [
     getItem('Person', 'sub1', <UserOutlined />, [
@@ -33,11 +37,32 @@ const items = [
     },
     getItem('Settings', 'sub4', <SettingOutlined/>, [
         getItem('Users', 'users'),
+        {
+            label: (
+                <a style={{textDecoration: "none"}} rel="noopener noreferrer">
+                    Logout
+                </a>
+            ),
+            key: 'logout',
+        },
     ]),
 ];
 const SideBar = () => {
+    const navigate = useNavigate();
+    const { message } = App.useApp()
+
+    const logout = () => {
+        Cookies.remove('token');
+        Cookies.remove('userData');
+    
+        message.success("Logout success");
+        navigate("/")
+    }
+
     const onClick = (e) => {
-        console.log('click ', e);
+        if (e.key == "logout") {
+            logout()
+        }
     };
     return (
         <Menu
