@@ -6,7 +6,8 @@ import { useQuery } from "react-query";
 
 import {HEAD_FAMILY_LIST_ADMIN_API} from "@api";
 
-import { MutationFetch, HandleError } from '../../Helpers/mutation'
+import { MutationFetch } from '../../Helpers/mutation'
+import useHandleError from '../../Helpers/handleError'
 
 const columns = [
     {
@@ -55,6 +56,7 @@ const BASE_URL = location.protocol + '//' + location.host;
 const AdminHeadFamilyList = () => {
     const [person, setPerson] = useState({});
     const [page, setPage] = useState(1);
+    const { handleError } = useHandleError();
 
     const {isLoading} = useQuery({
         queryKey: ['fetchPersonList', page],
@@ -64,8 +66,7 @@ const AdminHeadFamilyList = () => {
                 length: 10,
             }),
         onError: (error) => {
-            console.log(error.response.status)
-            HandleError(error)
+            handleError(error);
         },
         onSuccess: (response) => 
             setPerson(response.data.data),

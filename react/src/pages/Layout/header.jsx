@@ -1,4 +1,4 @@
-import { HomeOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { HomeOutlined, LogoutOutlined, UserOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { Menu, Button, App } from 'antd';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
@@ -9,43 +9,61 @@ import { HandleGetCookies } from '../Helpers/mutation'
 const BASE_URL = location.protocol + '//' + location.host;
 const userData = HandleGetCookies("userData", true);
 
+let dropDownMenu = [
+  {
+    label: (
+      <Button type="link" href={`${BASE_URL}/person/${userData.person_id}`} icon={<UserOutlined style={{verticalAlign: "baseline"}} />} style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
+        My Profile
+      </Button>
+    ),
+    key: 'my_profile'
+  },
+  {
+    label: (
+      <Button type="link" icon={<LogoutOutlined style={{verticalAlign: "baseline"}} />} style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
+        Logout
+      </Button>
+    ),
+    key: 'logout'
+  },
+]
+
+if (userData) {
+  if (userData.user_roles.some(val => val.role == "super_admin")) {
+    let newDropdownMenu = [
+      {
+        label: (
+          <Button type="link" href={`${BASE_URL}/admin/person/all-list`} icon={<AppstoreOutlined style={{verticalAlign: "baseline"}} />} style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
+            Admin Page
+          </Button>
+        ),
+        key: 'admin_page'
+      }, ...dropDownMenu
+    ]
+    dropDownMenu = newDropdownMenu
+  } 
+}
+
 const items = [
-    {
-      label: (
-        <a href={`${BASE_URL}/dashboard/${userData.person_id}`} style={{textDecoration: "none"}} rel="noopener noreferrer">
-          Family Tree
-        </a>
-      ),
-      key: 'home',
-      icon: <HomeOutlined />,
-    },
-    {
-      label: (
-        <Button type="link" style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
-          <img src={userData.profile_pict} alt="user_profile_pict" style={{width: "25px", borderRadius: "100%"}} />
-        </Button>
-      ),
-      key: 'profile_setting',
-      children: [
-        {
-          label: (
-            <Button type="link" href={`${BASE_URL}/person/${userData.person_id}`} icon={<UserOutlined style={{verticalAlign: "baseline"}} />} style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
-              My Profile
-            </Button>
-          ),
-          key: 'my_profile'
-        },
-        {
-          label: (
-            <Button type="link" icon={<LogoutOutlined style={{verticalAlign: "baseline"}} />} style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
-              Logout
-            </Button>
-          ),
-          key: 'logout'
-        },
-      ],
-    },
-  ];
+  {
+    label: (
+      <a href={`${BASE_URL}/dashboard/${userData.person_id}`} style={{textDecoration: "none"}} rel="noopener noreferrer">
+        Family Tree
+      </a>
+    ),
+    key: 'home',
+    icon: <HomeOutlined />,
+  },
+  {
+    label: (
+      <Button type="link" style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
+        <img src={userData.profile_pict} alt="user_profile_pict" style={{width: "25px", borderRadius: "100%"}} />
+      </Button>
+    ),
+    key: 'profile_setting',
+    children: dropDownMenu,
+  },
+];
 
 const HeaderBar = () => {
     const [current, setCurrent] = useState('mail');

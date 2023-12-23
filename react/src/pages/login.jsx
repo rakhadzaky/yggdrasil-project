@@ -39,11 +39,17 @@ const Login = () => {
             // set default header authorization to jwt
             axios.defaults.headers.common['Authorization'] = response.data.authorisation.type + " " + response.data.authorisation.token;
 
+            // map user roles data
+            let userRoles = []
+            response.data.user.roles_user.map((value) => {
+                userRoles.push({"role" : value.role.role})
+            })
             // store user data
             let userData = {
                 "name": response.data.user.name,
                 "email": response.data.user.email,
                 "profile_pict": response.data.user.profile_pict,
+                "user_roles": userRoles,
             }
             Cookies.set('userData', JSON.stringify(userData), { secure: true });
 
