@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminPersonController;
+use App\Http\Controllers\FamiliesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,7 +36,6 @@ Route::get('/person/detail/{pid}', [PersonsController::class, 'getDetailPersonBy
 
 Route::post('/person/search', [AuthController::class, 'CheckPersonLogName'])->name('search_person');
 
-
 // AdminPerson
 Route::get('/admin/person', [SuperAdminPersonController::class, 'FetchAllPersonData'])->name('admin_fetch_person');
 Route::get('/admin/person/{pid}', [SuperAdminPersonController::class, 'GetPersonDetail'])->name('admin_fetch_detail_person');
@@ -43,3 +43,8 @@ Route::get('/admin/headfamily', [SuperAdminPersonController::class, 'FetchAllHea
 Route::post('/admin/person', [SuperAdminPersonController::class, 'AddNewPerson'])->name('admin_add_person');
 Route::post('/admin/person/delete', [SuperAdminPersonController::class, 'DeletePerson'])->name('admin_delete_person');
 Route::post('/admin/person/update/{pid}', [SuperAdminPersonController::class, 'UpdatePerson'])->name('admin_update_person');
+
+// AdminFamilyController
+Route::post('/admin/family/create', [FamiliesController::class, "CreateFamily"])->name('admin_create_family');
+Route::post('/admin/family/assign', [FamiliesController::class, "AssignFamily"])->name('admin_assign_family');
+Route::get('/admin/family/members/{fid}', [FamiliesController::class, "FetchAllFamilyMember"])->name('admin_fetch_family_member');
