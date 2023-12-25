@@ -9,3 +9,6 @@ export const PERSON_DETAIL_API = `${BACKEND_BASE_URL}/api/person/detail`
 export const PERSON_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person`
 export const PERSON_DETAIL_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person`
 export const HEAD_FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/headfamily`
+
+export const ADMIN_SEARCH_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/search`
+export const ADMIN_INVALIDATE_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/invalidate`

@@ -53,7 +53,6 @@ const Login = () => {
             }
             Cookies.set('userData', JSON.stringify(userData), { secure: true });
 
-            console.log(response.data.user)
             if (response.data.user.person === null) {
                 // if data person doesn't exists bring the user to pre dashboard page
                 navigate(`pre/dashboard`)
@@ -66,7 +65,7 @@ const Login = () => {
                     ...userData,
                 }
                 Cookies.set('userData', JSON.stringify(userData), { secure: true });
-                navigate(`/dashboard/${response.data.user.person.id}`)
+                navigate(`/dashboard`)
             }
         })
         .catch(error => {

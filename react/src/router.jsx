@@ -7,6 +7,7 @@ import AdminPersonList from "./pages/Admin/PersonLists/view"
 import AdminPersonAdd from "./pages/Admin/PersonAdd/view"
 import AdminHeadFamilyList from "./pages/Admin/HeadFamilyLists/view"
 import AdminRelationForm from "./pages/Admin/PersonRelation/view"
+import JoinReferral from "./pages/JoinReferral/view"
 
 const router = createBrowserRouter([
     {
@@ -14,12 +15,21 @@ const router = createBrowserRouter([
         element: <Login />
     },
     {
-        path: '/dashboard/:pid',
+        path: '/dashboard',
         element: <DashboardUser />
     },
     {
-        path: '/pre/dashboard',
-        element: <PreDashboardUser />,
+        path: '/pre',
+        children: [
+            {
+                path: 'dashboard',
+                element: <PreDashboardUser />,
+            },
+            {
+                path:'referral',
+                element: <JoinReferral />
+            }
+        ]
     },
     {
         path: '/person/:pid',

@@ -7,6 +7,7 @@ use App\Http\Controllers\PersonsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminPersonController;
 use App\Http\Controllers\FamiliesController;
+use App\Http\Controllers\ReferralController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,3 +49,8 @@ Route::post('/admin/person/update/{pid}', [SuperAdminPersonController::class, 'U
 Route::post('/admin/family/create', [FamiliesController::class, "CreateFamily"])->name('admin_create_family');
 Route::post('/admin/family/assign', [FamiliesController::class, "AssignFamily"])->name('admin_assign_family');
 Route::get('/admin/family/members/{fid}', [FamiliesController::class, "FetchAllFamilyMember"])->name('admin_fetch_family_member');
+
+// ReferralController
+Route::post('/admin/referral/create', [ReferralController::class, "CreateReferral"])->name('admin_create_referral');
+Route::get('/admin/referral/search/{referral_code}', [ReferralController::class, "SearchReferralCode"])->name('admin_search_referral');
+Route::post('/admin/referral/invalidate', [ReferralController::class, "InvalidateUsedReferralCode"])->name('admin_invalidate_referral');

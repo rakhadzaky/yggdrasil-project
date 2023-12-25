@@ -27,6 +27,27 @@ export const MutationFetch = (apiURL, params) => {
     })
 }
 
+export const MutationSubmit = (method, apiURL, params) => {
+    const authorisationData = HandleGetCookies("token", true);
+
+    if (authorisationData === null) {
+        window.location.href = `/`
+        return
+    }
+    let currTime = new Date().getTime()
+    let expTime = new Date().setTime(authorisationData.exp_time)
+    if ( expTime < currTime ) {
+        window.location.href = `/`
+        return
+    }
+    return axios({method: method, url: apiURL, data: params,
+        headers:{
+            'content-type': 'text/json',
+            "Authorization": authorisationData.type + " " + authorisationData.token,
+        }
+    })
+}
+
 export const HandleError = (error) => {
     const errorCode = error.response.status
 

@@ -47,7 +47,7 @@ if (userData) {
 const items = [
   {
     label: (
-      <a href={`${BASE_URL}/dashboard/${userData.person_id}`} style={{textDecoration: "none"}} rel="noopener noreferrer">
+      <a href={`${BASE_URL}/dashboard`} style={{textDecoration: "none"}} rel="noopener noreferrer">
         Family Tree
       </a>
     ),
