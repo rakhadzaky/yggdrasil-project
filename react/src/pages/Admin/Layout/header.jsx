@@ -1,15 +1,13 @@
 import { AppstoreOutlined, ApartmentOutlined } from '@ant-design/icons';
 import { Menu } from 'antd';
 import { useState } from 'react';
-import { HandleGetCookies } from '../../Helpers/mutation'
 
 const BASE_URL = location.protocol + '//' + location.host;
-const userData = HandleGetCookies("userData", true);
 
 const items = [
     {
       label: (
-        <a href={`${BASE_URL}/dashboard/${userData.person_id}`} style={{textDecoration: "none"}} rel="noopener noreferrer"></a>
+        <a href={`${BASE_URL}/dashboard`} style={{textDecoration: "none"}} rel="noopener noreferrer"></a>
       ),
       key: 'family_tree',
       icon: <ApartmentOutlined />,

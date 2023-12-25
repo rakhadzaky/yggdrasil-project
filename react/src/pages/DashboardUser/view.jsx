@@ -7,8 +7,7 @@ import FooterBar from "../Layout/footer"
 import GraphTree from './Components/GraphTree/view'
 import { MutationFetch } from '../Helpers/mutation'
 import useHandleError from '../Helpers/handleError'
-
-import {useParams} from "react-router-dom";
+import { HandleGetCookies } from '../Helpers/mutation'
 
 import { PERSON_FAMILY_TREE_API } from '@api';
 
@@ -18,10 +17,11 @@ const View = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { handleError } = useHandleError();
 
-    const {pid} = useParams()
+    const userData = HandleGetCookies("userData", true);
+    const userPID = userData.person_id;
 
     useEffect(() => {
-        MutationFetch(`${PERSON_FAMILY_TREE_API}/${pid}`)
+        MutationFetch(`${PERSON_FAMILY_TREE_API}/${userPID}`)
             .then(response => {
                 appendFamilyNodes(response.data.data);
                 setIsLoading(false);

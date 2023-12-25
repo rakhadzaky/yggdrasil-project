@@ -5,7 +5,6 @@ import HeaderBar from "../Layout/header"
 import FooterBar from "../Layout/footer"
 import {useParams} from "react-router-dom";
 import { BACKEND_BASE_URL, PERSON_DETAIL_API } from '@api';
-import { HandleGetCookies } from '../Helpers/mutation'
 import useHandleError from '../Helpers/handleError'
 
 import { MutationFetch } from '../Helpers/mutation'
@@ -19,9 +18,6 @@ const DetailPerson = () => {
 
     const {pid} = useParams()
     const BASE_URL = location.protocol + '//' + location.host;
-
-    const userData = HandleGetCookies("userData", true);
-    const userPID = userData.person_id;
 
     useEffect(() => {
         MutationFetch(`${PERSON_DETAIL_API}/${pid}`)
@@ -61,7 +57,7 @@ const DetailPerson = () => {
                     title: <HomeOutlined />,
                 },
                 {
-                    href: `${BASE_URL}/dashboard/${userPID}`,
+                    href: `${BASE_URL}/dashboard`,
                     title: 'Family Tree',
                 },
                 {
