@@ -5,6 +5,7 @@ import PreDashboardUser from "./pages/PreDashboardUser/view";
 import DetailPerson from "./pages/DetailPerson/view"
 import AdminPersonList from "./pages/Admin/PersonLists/view"
 import AdminPersonAdd from "./pages/Admin/PersonAdd/view"
+import AdminPersonEdit from "./pages/Admin/PersonEdit/view"
 import AdminHeadFamilyList from "./pages/Admin/HeadFamilyLists/view"
 import AdminRelationForm from "./pages/Admin/PersonRelation/view"
 import JoinReferral from "./pages/JoinReferral/view"
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
             {
                 path: 'person/add',
                 element: <AdminPersonAdd />,
+            },
+            {
+                path: 'person/edit/:pid',
+                element: <AdminPersonEdit />
             },
             {
                 path: 'head-of-family/all-list',

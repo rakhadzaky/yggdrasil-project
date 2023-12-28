@@ -27,7 +27,7 @@ export const MutationFetch = (apiURL, params) => {
     })
 }
 
-export const MutationSubmit = (method, apiURL, params) => {
+export const MutationSubmit = (method, apiURL, params, usingFormData) => {
     const authorisationData = HandleGetCookies("token", true);
 
     if (authorisationData === null) {
@@ -40,11 +40,18 @@ export const MutationSubmit = (method, apiURL, params) => {
         window.location.href = `/`
         return
     }
-    return axios({method: method, url: apiURL, data: params,
-        headers:{
-            'content-type': 'text/json',
-            "Authorization": authorisationData.type + " " + authorisationData.token,
+    let headers = {
+        'content-type': 'text/json',
+        "Authorization": authorisationData.type + " " + authorisationData.token,
+    }
+    if (usingFormData) {
+        headers = {
+            ...headers,
+            'Content-Type': 'multipart/form-data',
         }
+    }
+    return axios({method: method, url: apiURL, data: params,
+        headers: headers
     })
 }
 
@@ -62,8 +69,11 @@ export const HandleError = (error) => {
 
 export const HandleGetCookies = (cookiesName, logoutOnError) => {
     const cookiesData = Cookies.get(cookiesName);
-    if (cookiesData == null && logoutOnError) {
-        return false
+    if (cookiesData == null) {
+        if (logoutOnError) {
+            return false
+        }
+        return 0
     }
     const decodeData = JSON.parse(cookiesData);
 

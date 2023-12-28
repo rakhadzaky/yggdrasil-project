@@ -96,4 +96,12 @@ class FamiliesController extends Controller
             'data' => $personList
         ], 200);
     }
+
+    public function FetchAllFamily(Request $request) {
+        $families = Families::all();
+        return response([
+            'success' => true,
+            'data' => $families
+        ], 200);
+    }
 }

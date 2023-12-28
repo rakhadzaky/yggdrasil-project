@@ -4,8 +4,10 @@ import { useCallback, useEffect } from 'react';
 
 function useHandleError (error) {
     const navigate = useNavigate();
-    const { message } = App.useApp()
+    const { message } = App.useApp();
     const doHandleError = useCallback( async(error) => {
+        console.log(error)
+        console.log(error.response)
         const errorCode = error.response.status
         if (errorCode === 401) {
             message.open({
@@ -22,10 +24,11 @@ function useHandleError (error) {
         } else {
             message.open({
                 type: 'error',
-                content: error.response.data.message,
+                content: 'something went wrong',
             });
+            console.log(error.response.data.message);
+            return error.response.data.message;
         }
-        return
     }, [error])
 
     useEffect(() => {

@@ -11,7 +11,7 @@ import {
     Select,
     Image,
     Descriptions,
-    Spin
+    Spin,
 } from 'antd';
 import PropTypes from 'prop-types';
 import { BACKEND_BASE_URL, PERSON_LIST_ADMIN_API, FAMILY_LIST_ADMIN_API } from '@api';
@@ -23,7 +23,7 @@ import ItemForm from './itemForm'
 
 const { Title } = Typography;
 
-const FormRelation = ({personData, handleAssignRelation, isLoading, validationRelationMessage}) => {
+const FormRelation = ({ personData, handleAssignRelation, isLoading, validationRelationMessage }) => {
     const person = personData
     const [form] = Form.useForm();
     const [familyList, setFamilyList] = useState()
@@ -143,16 +143,7 @@ const FormRelation = ({personData, handleAssignRelation, isLoading, validationRe
         }
     })
 
-    useEffect(() => {
-        if (person !== undefined) {
-            form.setFieldsValue({
-                "fid": (person.family.father !== null ? person.family.father.id : null),
-                "mid": (person.family.mother !== null ? person.family.mother.id : null),
-                "pid_relation": (person.family.partner !== null ? person.family.partner.id : null),
-                "is_head_of_family": (person.family.head !== null ? (person.family.head.id === person.id) : false),
-            })
-        }
-    }, [person])
+    console.log("family_list: ", familyList);
 
     if ((fatherDataLoading || peopleData.fatherlength <= 0) ||
         (motherDataLoading || peopleData.motherlength <= 0) ||
@@ -229,8 +220,8 @@ const FormRelation = ({personData, handleAssignRelation, isLoading, validationRe
             </Row>
             <Form.Item
                 wrapperCol={{
-                offset: 8,
-                span: 16,
+                    offset: 8,
+                    span: 16,
                 }}
                 style={{
                     marginTop: '8px'

@@ -41,4 +41,12 @@ class PersonRelations extends Model
     {
         return $this->hasOne(Persons::class, 'id', 'mid');
     }
+
+    /**
+     * Get the partner person data.
+     */
+    public function partnerPerson()
+    {
+        return $this->hasOne(Persons::class, 'id', 'pid_relation');
+    }
 }

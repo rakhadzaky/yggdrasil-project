@@ -47,8 +47,7 @@ const JoinReferral = () => {
         MutationSubmit('post', `${ADMIN_INVALIDATE_REFERRAL_API}`,
             {
                 referral_code: referralCode
-            }
-        )
+            }, false)
             .then(() => {
                 changeStep(current + 1);
                 let userData = HandleGetCookies("userData", true);
