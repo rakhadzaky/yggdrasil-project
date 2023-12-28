@@ -44,11 +44,14 @@ Route::get('/admin/headfamily', [SuperAdminPersonController::class, 'FetchAllHea
 Route::post('/admin/person', [SuperAdminPersonController::class, 'AddNewPerson'])->name('admin_add_person');
 Route::post('/admin/person/delete', [SuperAdminPersonController::class, 'DeletePerson'])->name('admin_delete_person');
 Route::post('/admin/person/update/{pid}', [SuperAdminPersonController::class, 'UpdatePerson'])->name('admin_update_person');
+Route::get('/admin/family/list/{pid}', [SuperAdminPersonController::class, 'GetFamilyList'])->name('admin_get_family_list');
+Route::post('/admin/person/relation/add', [SuperAdminPersonController::class, 'AssignPersonRelation'])->name('admin_assign_person_relation');
 
 // AdminFamilyController
 Route::post('/admin/family/create', [FamiliesController::class, "CreateFamily"])->name('admin_create_family');
 Route::post('/admin/family/assign', [FamiliesController::class, "AssignFamily"])->name('admin_assign_family');
 Route::get('/admin/family/members/{fid}', [FamiliesController::class, "FetchAllFamilyMember"])->name('admin_fetch_family_member');
+Route::get('/admin/family', [FamiliesController::class, "FetchAllFamily"])->name('admin_fetch_family_list');
 
 // ReferralController
 Route::post('/admin/referral/create', [ReferralController::class, "CreateReferral"])->name('admin_create_referral');

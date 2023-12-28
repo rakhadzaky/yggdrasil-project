@@ -1,22 +1,29 @@
 import { useState } from 'react';
-import axios from 'axios';
-import { Space, Table, Divider, Row, Col, Spin, message, Button, Breadcrumb } from 'antd';
+import { Row, Col, Spin, Breadcrumb, App } from 'antd';
 import FormRelation from "./form"
 import CompleteLayout from '../Layout/CompleteLayout';
 
 import {useParams} from "react-router-dom";
 import { useQuery } from "react-query";
-import { MutationFetch, HandleError } from '../../Helpers/mutation'
+import { MutationFetch, MutationSubmit, HandleError } from '../../Helpers/mutation'
+import useHandleError from '../../Helpers/handleError'
 
-import {PERSON_DETAIL_ADMIN_API} from "@api";
+import { useNavigate } from "react-router-dom";
 
-const BASE_URL = location.protocol + '//' + location.host;
+import {PERSON_DETAIL_ADMIN_API, ASSIGN_PERSON_RELATION_ADMIN_API} from "@api";
 
 function AdminPersonAdd() {
     const [person, setPerson] = useState({});
     const {pid} = useParams()
+    const { handleError } = useHandleError();
+    const { message } = App.useApp()
 
-    const {isLoading, refetch} = useQuery({
+    const [isLoadingButton, setIsLoadingButton] = useState(false);
+    const [validationRelationMessage, setValidationRelationMessage] = useState([]);
+
+    const navigate = useNavigate();
+
+    const {isLoading} = useQuery({
         queryKey: ['fetchPersonList', pid],
         queryFn: () =>
             MutationFetch(`${PERSON_DETAIL_ADMIN_API}/${pid}`),
@@ -27,6 +34,32 @@ function AdminPersonAdd() {
         onSuccess: (response) => 
             setPerson(response.data.data),
     })
+
+    const handleAssignRelation = (values) => {
+        setIsLoadingButton(true)
+
+        let bodyData = {
+            ...values,
+            pid: pid,
+        }
+
+        MutationSubmit('post', `${ASSIGN_PERSON_RELATION_ADMIN_API}`, bodyData, false)
+            .then(() => {
+                message.open({
+                    type: 'success',
+                    content: 'Update data success',
+                    duration: 2,
+                })
+                setIsLoadingButton(false)
+                navigate(`/admin/person/all-list`)
+            })
+            .catch(error => {
+                setIsLoadingButton(false)
+                handleError(error).then((res) => {
+                    setValidationRelationMessage(res);
+                })
+            });
+    }
 
     if (isLoading) {
         return (
@@ -55,7 +88,7 @@ function AdminPersonAdd() {
             </div>
             <Row style={{minHeight: '90vh', padding: '60px 0', backgroundColor: 'white'}}>
                 <Col span={16} offset={2}>
-                    <FormRelation personData={person} />
+                    <FormRelation personData={person} handleAssignRelation={handleAssignRelation} isLoading={isLoadingButton} validationRelationMessage={validationRelationMessage}/>
                 </Col>
             </Row>
         </CompleteLayout>

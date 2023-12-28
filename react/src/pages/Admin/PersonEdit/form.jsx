@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Button,
     DatePicker,
@@ -7,14 +7,9 @@ import {
     Radio,
     Switch,
     Upload,
-    Divider,
-    Select,
-    Spin
 } from 'antd';
 import PropTypes from 'prop-types';
-import { useQuery } from "react-query";
-import { MutationFetch, HandleError, HandleGetCookies } from '../../Helpers/mutation'
-import { PERSON_FAMILY_LIST_ADMIN_API } from '@api';
+import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const normFile = (e) => {
@@ -23,42 +18,13 @@ const normFile = (e) => {
     }
     return e?.fileList;
 };
-const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validationPersonMessage}) => {
+const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoading, fileList, validationMessage}) => {
     const [form] = Form.useForm();
-    const [ isUseImageFile, setIsUseImageFile ] = useState(false);
-    const [familyList, setFamilyList] = useState()
-    const userData = HandleGetCookies("userData", true);
-    const userPID = userData.person_id;
+    const [ isUseImageFile, setIsUseImageFile ] = useState(personData.img_file !== null);
 
     const handleChangeSwitchImage = (checked) => {
         setIsUseImageFile(checked)
     }
-
-    const handleSubmit = (values) => {
-        Object.keys(values).map((field_name) => {
-            form.setFields([
-                {
-                    name: field_name,
-                    errors: [],
-                },
-            ])
-        })
-
-        handleOnFinishForm(values);
-    }
-
-    useEffect(() => {
-        if (validationPersonMessage !== undefined) {
-            Object.keys(validationPersonMessage).map((field_name) => {
-                form.setFields([
-                    {
-                        name: field_name,
-                        errors: validationPersonMessage[field_name],
-                    },
-                ])
-            })   
-        }
-    }, [validationPersonMessage])
 
     const onPreview = async (file) => {
         let src = file.url;
@@ -75,26 +41,31 @@ const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validati
         imgWindow?.document.write(image.outerHTML);
     };
 
-    const {isLoading: familyListLoading} = useQuery({
-        queryKey: ['fetchFamilyList'],
-        queryFn: () =>
-            MutationFetch(`${PERSON_FAMILY_LIST_ADMIN_API}/${userPID}`),
-        onError: (error) => {
-            console.log(error.response.status)
-            HandleError(error)
-        },
-        onSuccess: (response) => {
-            setFamilyList(response.data.data);
-        }
-    })
+    const handleSubmit = (values) => {
+        Object.keys(values).map((field_name) => {
+            form.setFields([
+                {
+                    name: field_name,
+                    errors: [],
+                },
+            ])
+        })
 
-    if (familyListLoading) {
-        return (
-            <div style={{margin: "20px 0", marginBottom: "20px", padding: "30px 50px", textAlign: "center", minHeight: '90vh'}}>
-                <Spin />
-            </div>
-        )
+        handleOnFinishForm(values);
     }
+
+    useEffect(() => {
+        if (validationMessage !== undefined) {
+            Object.keys(validationMessage).map((field_name) => {
+                form.setFields([
+                    {
+                        name: field_name,
+                        errors: validationMessage[field_name],
+                    },
+                ])
+            })   
+        }
+    }, [validationMessage])
 
     return (
         <>
@@ -108,17 +79,16 @@ const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validati
             layout="horizontal"
             onFinish={handleSubmit}
             form={form}
+            initialValues={{
+                name: personData.name,
+                gender: personData.gender,
+                switchImage: isUseImageFile,
+                img_url: personData.img_url,
+                live_loc: personData.live_loc,
+                phone: personData.phone,
+                birthdate: dayjs(personData.birthdate),
+            }}
         >
-            <Form.Item label="Create person for family" name="family_id" rules={[{ required: true, message: 'Please select the family' }]}>
-                <Select
-                    options={Object
-                        .keys(familyList)
-                        .map((i) => {
-                            return ({value: familyList[i].id, label: familyList[i].family_name})
-                        })}
-                />
-            </Form.Item>
-            <Divider />
             <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please enter the person name' }]}>
                 <Input />
             </Form.Item>
@@ -143,6 +113,7 @@ const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validati
                         beforeUpload={() => false} 
                         maxCount={1}
                         accept="image/png, image/jpeg"
+                        fileList={fileList}
                     >
                         {'+ Upload'}
                     </Upload>
@@ -177,10 +148,12 @@ const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validati
 };
 
 FormCreatePerson.propTypes = {
+    personData: PropTypes.object,
     handleOnFinishForm: PropTypes.func,
     handleUpload: PropTypes.func,
     isLoading: PropTypes.bool,
-    validationPersonMessage: PropTypes.object
+    fileList: PropTypes.object,
+    validationMessage: PropTypes.object,
 };
 
 export default FormCreatePerson;

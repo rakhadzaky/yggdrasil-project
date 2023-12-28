@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+use App\Models\FamilyRelations;
 
 class Persons extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $table = 'persons';
+    protected $softDelete = true;
     protected $primaryKey = 'id';
     protected $fillable = [
         'name',
@@ -25,5 +29,9 @@ class Persons extends Model
             return $query->where('name','like','%'+$search+'%');
         }
         return $query;
+    }
+
+    public function families() {
+        return $this->hasMany(FamilyRelations::class, 'person_id', 'id');
     }
 }

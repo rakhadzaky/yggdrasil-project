@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Persons;
 use App\Models\PersonRelations;
+use App\Models\Families;
+use App\Models\FamilyRelations;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -30,6 +33,7 @@ class SuperAdminPersonController extends Controller
             'gender'    => 'alpha|nullable',
             'page'      => 'numeric|nullable',
             'length'    => 'numeric|nullable',
+            'family_id' => 'numeric|nullable',
         ]);
         if ($validator->fails()) {
             return response([
@@ -38,8 +42,22 @@ class SuperAdminPersonController extends Controller
             ], 400);
         }
 
+        if ($request->family_id) {
+            $jwtToken = explode(' ', $request->header('Authorization'))[1];
+            $userData = Auth::payload($jwtToken)->toArray();
+
+            $familyData = FamilyRelations::where('family_id', $request->family_id)->where('person_id', $userData["user"]["person"]["id"])->first();
+            if ($familyData == null) {
+                return response([
+                    'success' => false,
+                    'message' => 'Invalid family data',
+                ], 400);
+            }
+        }
+
         $search = $request->input('search');
         $gender = $request->input('gender');
+        $family_id = $request->input('family_id');
 
         $page = $request->input('page');
         $length = $request->input('length');
@@ -49,6 +67,10 @@ class SuperAdminPersonController extends Controller
         $fetchPersonQuery = DB::table('persons_relations')
         ->select('persons_relations.hfid', DB::raw('count(persons_relations.hfid) as total_member'), 'persons.*')
         ->join('persons','persons.id', '=', 'persons_relations.hfid')
+        ->orWhereNull('persons.deleted_at')
+        ->when($family_id, function ($query, $family_id) {
+            return $query->join('family_relations','family_relations.person_id', '=', 'persons.id')->where('family_relations.family_id', $family_id);
+        })
         ->groupBy('persons_relations.hfid')
         ->when($search, function ($query, $search) {
             return $query->having('name', 'LIKE', '%'.$search.'%');
@@ -96,6 +118,7 @@ class SuperAdminPersonController extends Controller
             'gender'    => 'alpha|nullable',
             'page'      => 'numeric|nullable',
             'length'    => 'numeric|nullable',
+            'family_id' => 'numeric|nullable',
         ]);
         if ($validator->fails()) {
             return response([
@@ -104,8 +127,22 @@ class SuperAdminPersonController extends Controller
             ], 400);
         }
 
+        if ($request->family_id) {
+            $jwtToken = explode(' ', $request->header('Authorization'))[1];
+            $userData = Auth::payload($jwtToken)->toArray();
+
+            $familyData = FamilyRelations::where('family_id', $request->family_id)->where('person_id', $userData["user"]["person"]["id"])->first();
+            if ($familyData == null) {
+                return response([
+                    'success' => false,
+                    'message' => 'Invalid family data',
+                ], 400);
+            }
+        }
+
         $search = $request->input('search');
         $gender = $request->input('gender');
+        $family_id = $request->input('family_id');
 
         $page = $request->input('page');
         $length = $request->input('length');
@@ -114,7 +151,11 @@ class SuperAdminPersonController extends Controller
 
         $fetchPersonQuery = DB::table('persons')
         ->select('persons.*', 'persons_relations.pid')
+        ->orWhereNull('persons.deleted_at')
         ->leftjoin('persons_relations','persons.id', '=', 'persons_relations.pid')
+        ->when($family_id, function ($query, $family_id) {
+            return $query->join('family_relations','family_relations.person_id', '=', 'persons.id')->where('family_relations.family_id', $family_id);
+        })
         ->when($search, function ($query, $search) {
             return $query->where('name', 'LIKE', '%'.$search.'%');
         })
@@ -157,6 +198,7 @@ class SuperAdminPersonController extends Controller
 
     public function AddNewPerson(Request $request) {
         $validator = Validator::make($request->all(), [
+            'family_id' => 'required|exists:families,id',
             'name' => 'required|regex:/^[a-z\d\-_\s]+$/i',
             'gender' => 'required|alpha',
             'birthdate' => 'required|date',
@@ -203,6 +245,7 @@ class SuperAdminPersonController extends Controller
             $imgData = 'storage/'.$imgFileName;
         }
 
+        // prepare data for person data
         $insertPerson = new Persons;
         $insertPerson->name = $request->input('name');
         $insertPerson->gender = $request->input('gender');
@@ -212,9 +255,22 @@ class SuperAdminPersonController extends Controller
         $insertPerson->live_loc = $request->input('live_loc');
         $insertPerson->phone = $request->input('phone');
 
+        // prepare data for family relations
+        $familyRelationsData = [
+            "family_id" => $request->family_id,
+        ];
+
+        // store and save data using transaction
+        DB::beginTransaction();
         try {
             $insertPerson->save();
+            $familyRelationsData["person_id"] = $insertPerson->id;
+            FamilyRelations::create($familyRelationsData);
+
+            DB::commit();
         } catch (QueryException $e) {
+            DB::rollback();
+
             return response([
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -223,6 +279,7 @@ class SuperAdminPersonController extends Controller
 
         return response([
             'success' => true,
+            'inserted_id' => $insertPerson->id,
         ], 200);
     }
 
@@ -263,7 +320,7 @@ class SuperAdminPersonController extends Controller
             'gender' => 'required|alpha',
             'birthdate' => 'required|date',
             'img_url' => 'url:http,https',
-            'img_file' => 'mimes:jpg,jpeg,bmp,png',
+            'img_file' => 'mimes:jpg,jpeg,bmp,png|nullable',
             'live_loc' => 'regex:/^[a-z\d\-_\s]+$/i|nullable',
             'phone' => 'numeric|nullable'
         ]);
@@ -279,16 +336,6 @@ class SuperAdminPersonController extends Controller
             return response([
                 'success' => false,
                 'message' => 'person not found',
-            ], 400);
-        }
-
-        if ($request->input('img_url') == null && $request->file('img_file') == null) {
-            return response([
-                'success' => false,
-                'message' => [
-                    'img_url' => ['image url or image file is required'],
-                    'img_file' => ['image url or image file is required'],
-                ],
             ], 400);
         }
 
@@ -316,10 +363,14 @@ class SuperAdminPersonController extends Controller
         $insertPerson->name = $request->input('name');
         $insertPerson->gender = $request->input('gender');
         $insertPerson->birthdate = $request->input('birthdate');
-        $insertPerson->img_url = $request->input('img_url');
-        $insertPerson->img_file = $imgData;
         $insertPerson->live_loc = $request->input('live_loc');
         $insertPerson->phone = $request->input('phone');
+        if ($imgData != null) {
+            $insertPerson->img_file = $imgData;
+        }
+        if ($request->input('img_url')) {
+            $insertPerson->img_url = $request->input('img_url');
+        }
 
         try {
             $insertPerson->save();
@@ -345,12 +396,14 @@ class SuperAdminPersonController extends Controller
             ], 404);
         }
 
+        // fetch person relation
         $personRelation = PersonRelations::where('pid', '=', $pid)->first();
-        
         if ($personRelation != null) {
             $relationData = [
                 "father" => $personRelation->fatherPerson,
                 "mother" => $personRelation->motherPerson,
+                "partner" => $personRelation->partnerPerson,
+                "head" => $personRelation->headOfFamilyPerson,
             ];
 
             $person->family = $relationData;
@@ -358,9 +411,92 @@ class SuperAdminPersonController extends Controller
             $person->family = null;
         }
 
+        // fetch person relation
+        $person->families = $person->families;
+
         return response([
             'success' => true,
             'data' => $person
+        ], 200);
+    }
+
+    public function GetFamilyList(Request $request, $person_id) {
+        $person = Persons::find($person_id);
+        if (!$person) {
+            return response([
+                'success' => false,
+                'data' => null,
+                'message' => 'Data not found'
+            ], 404);
+        }
+
+        $families = [];
+        $familyRelations = $person->families;
+        foreach ($familyRelations as $value) {
+            array_push($families, $value->family);
+        }
+
+        return response([
+            'success' => true,
+            'data' => $families
+        ], 200);
+    }
+
+    public function AssignPersonRelation(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'pid' => 'nullable|numeric|exists:persons,id',
+            'mid' => 'nullable|numeric|exists:persons,id',
+            'fid' => 'nullable|numeric|exists:persons,id',
+            'pid_relation' => 'nullable|numeric|exists:persons,id',
+            'is_head_of_family' => 'boolean',
+            'family_id_list' => 'required|array',
+            'family_id_list.*' => 'numeric|exists:families,id',
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        // prepare person relation data
+        $personRelationData = [
+            'pid' => $request->pid,
+            'mid' => $request->mid,
+            'fid' => $request->fid,
+            'pid_relation' => $request->pid_relation,
+        ];
+        if ($request->is_head_of_family) {
+            $personRelationData['hfid'] = $request->pid;
+        }
+
+        // prepare family relation data
+        $familyRelationsData = [];
+        foreach ($request->family_id_list as $family_id) {
+            array_push($familyRelationsData, [
+                'person_id' => $request->pid,
+                'family_id' => $family_id
+            ]);
+        }
+
+        // store and update data using transaction
+        DB::beginTransaction();
+        try {
+            PersonRelations::upsert($personRelationData, ['pid'], ['mid', 'fid', 'pid_relation']);
+            FamilyRelations::upsert($familyRelationsData, ['person_id', 'family_id']);
+
+            DB::commit();
+        } catch (QueryException $e) {
+            DB::rollback();
+
+            return response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response([
+            'success' => true,
         ], 200);
     }
 }
