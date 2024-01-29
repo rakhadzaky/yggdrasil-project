@@ -5,9 +5,20 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Persons;
 use App\Models\PersonRelations;
+use App\Models\Families;
+use App\Models\FamilyRelations;
+use App\Models\Roles;
+use App\Models\RolesUser;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
+use Image;
+use DateTime;
 
 class PersonsController extends Controller
 {
@@ -324,6 +335,125 @@ class PersonsController extends Controller
         return response([
             'success' => true,
             'data' => $person
+        ], 200);
+    }
+
+    public function AddNewFamilyAndPerson(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'family_name'   => 'required|regex:/^[a-z\d\-_\s]+$/i',
+            'main_address'      => 'required|regex:/(^[-0-9A-Za-z.,\/ ]+$)/|nullable',
+            'name' => 'required|regex:/^[a-z\d\-_\s]+$/i',
+            'gender' => 'required|alpha',
+            'birthdate' => 'required|date',
+            'img_url' => 'url:http,https',
+            'img_file' => 'mimes:jpg,jpeg,bmp,png',
+            'live_loc' => 'regex:/^[a-z\d\-_\s]+$/i|nullable',
+            'phone' => 'numeric|nullable'
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        if ($request->input('img_url') == null && $request->file('img_file') == null) {
+            return response([
+                'success' => false,
+                'message' => [
+                    'img_url' => ['image url or image file is required'],
+                    'img_file' => ['image url or image file is required'],
+                ],
+            ], 400);
+        }
+
+        // create family prepare data
+        $family = new Families;
+        $family->family_name = $request->family_name;
+        $family->family_address = $request->main_address;
+
+        // create person data
+        $imgData = null;
+        if ($request->file('img_file') != null) {
+            // get image
+            $imgFile = $request->file('img_file');
+            $img = Image::make($imgFile->getRealPath());
+            $img->resize(720, 720, function ($constraint) {
+                $constraint->aspectRatio();                 
+            });
+            
+            // rename image
+            $date = new DateTime();
+            $dateStr = $date->format('YmdHis');
+            $imgFileName = 'img/'.$request->input('name').'-'.$dateStr.'.'.$imgFile->getClientOriginalExtension();
+
+            // store
+            $img->stream();
+            Storage::disk('local')->put('public/'.$imgFileName, $img, 'public');
+
+            $imgData = 'storage/'.$imgFileName;
+        }
+
+        // prepare data for person data
+        // get user data from authorization
+        $jwtToken = explode(' ', $request->header('Authorization'))[1];
+        $userData = Auth::payload($jwtToken)->toArray();
+
+        $insertPerson = new Persons;
+        $insertPerson->user_id = $userData["user"]["id"];
+        $insertPerson->name = $request->input('name');
+        $insertPerson->gender = $request->input('gender');
+        $insertPerson->birthdate = $request->input('birthdate');
+        $insertPerson->img_url = $request->input('img_url');
+        $insertPerson->img_file = $imgData;
+        $insertPerson->live_loc = $request->input('live_loc');
+        $insertPerson->phone = $request->input('phone');
+
+        // assign person to family
+        // prepare data for family relations
+        $familyRelationsData = [
+            "family_id" => 0,
+            "person_id" => 0
+        ];
+
+        // prepare data for person relations
+        $personRelationData = [
+            "pid" => 0,
+            "hfid" => 0,
+        ];
+
+        // prepare data for roles admin
+        $roleData = [
+            "role_id" => 1, // role 1 = Admin
+            "user_id" => $userData["user"]["id"],
+        ];
+
+        // store and save data using transaction
+        DB::beginTransaction();
+        try {
+            $family->save();
+            $insertPerson->save();
+            $familyRelationsData["family_id"] = $family->id;
+            $familyRelationsData["person_id"] = $insertPerson->id;
+            FamilyRelations::create($familyRelationsData);
+            $personRelationData["pid"] = $insertPerson->id;
+            $personRelationData["hfid"] = $insertPerson->id;
+            PersonRelations::create($personRelationData);
+            RolesUser::upsert($roleData, ['user_id', 'role_id']);
+
+            DB::commit();
+        } catch (QueryException $e) {
+            DB::rollback();
+
+            return response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response([
+            'success' => true,
+            'inserted_id' => $insertPerson->id,
         ], 200);
     }
 }

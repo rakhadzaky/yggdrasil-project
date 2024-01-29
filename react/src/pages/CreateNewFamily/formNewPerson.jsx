@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
     Button,
     DatePicker,
@@ -9,7 +9,6 @@ import {
     Upload,
 } from 'antd';
 import PropTypes from 'prop-types';
-import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const normFile = (e) => {
@@ -18,9 +17,9 @@ const normFile = (e) => {
     }
     return e?.fileList;
 };
-const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoading, fileList, validationMessage}) => {
+const FormNewPerson = ({personData, handleOnFinishForm, handleUpload, isLoading, fileList}) => {
     const [form] = Form.useForm();
-    const [ isUseImageFile, setIsUseImageFile ] = useState(personData.img_file !== null);
+    const [ isUseImageFile, setIsUseImageFile ] = useState((personData !== undefined ? personData.img_file !== null : false));
 
     const handleChangeSwitchImage = (checked) => {
         setIsUseImageFile(checked)
@@ -54,18 +53,8 @@ const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoadi
         handleOnFinishForm(values);
     }
 
-    useEffect(() => {
-        if (validationMessage !== undefined) {
-            Object.keys(validationMessage).map((field_name) => {
-                form.setFields([
-                    {
-                        name: field_name,
-                        errors: validationMessage[field_name],
-                    },
-                ])
-            })   
-        }
-    }, [validationMessage])
+    console.log(personData);
+    console.log(fileList);
 
     return (
         <>
@@ -79,15 +68,7 @@ const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoadi
             layout="horizontal"
             onFinish={handleSubmit}
             form={form}
-            initialValues={{
-                name: personData.name,
-                gender: personData.gender,
-                switchImage: isUseImageFile,
-                img_url: personData.img_url,
-                live_loc: personData.live_loc || "",
-                phone: personData.phone,
-                birthdate: dayjs(personData.birthdate),
-            }}
+            initialValues={personData}
         >
             <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please enter the person name' }]}>
                 <Input />
@@ -139,7 +120,7 @@ const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoadi
                 }}
             >
                 <Button type="primary" style={{float: 'right'}} htmlType="submit" loading={isLoading}>
-                    Update Person
+                    Save & Continue
                 </Button>
             </Form.Item>
         </Form>
@@ -147,13 +128,12 @@ const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoadi
     );
 };
 
-FormCreatePerson.propTypes = {
+FormNewPerson.propTypes = {
     personData: PropTypes.object,
     handleOnFinishForm: PropTypes.func,
     handleUpload: PropTypes.func,
     isLoading: PropTypes.bool,
-    fileList: PropTypes.object,
-    validationMessage: PropTypes.object,
+    fileList: PropTypes.array,
 };
 
-export default FormCreatePerson;
+export default FormNewPerson;

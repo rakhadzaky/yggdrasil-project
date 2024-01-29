@@ -8,10 +8,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\ClientException;
-
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Persons;
 use App\Models\User;
+use App\Models\Roles;
+use App\Models\RolesUser;
 
 class AuthController extends Controller
 {
@@ -49,17 +51,36 @@ class AuthController extends Controller
         $user = User::where("email", $googleUserInfo->email)->first();
         if ($user == null) {
             // if user doesn't exists then create the new one
-            $user = User::create([
-                'name' => $googleUserInfo->name,
-                'email' => $googleUserInfo->email,
-                'profile_pict' => $googleUserInfo->picture,
-            ]);
+            $user = new User;
+            $user->name = $googleUserInfo->name;
+            $user->email = $googleUserInfo->email;
+            $user->profile_pict = $googleUserInfo->picture;
+        } else {
+            // update profile pict if the profile pict changed or doesn't exists
+            if ($user->profile_pict == null || $user->profile_pict != $googleUserInfo->picture) {
+                $user->profile_pict = $googleUserInfo->picture;
+            }   
         }
 
-        // update profile pict if the profile pict changed or doesn't exists
-        if ($user->profile_pict == null || $user->profile_pict != $googleUserInfo->picture) {
-            $user->profile_pict = $googleUserInfo->picture;
+        $rolesData = [
+            'role_id' => 2, // role 2 = general
+        ];
+
+        // store and save data using transaction
+        DB::beginTransaction();
+        try {
             $user->save();
+            $rolesData['user_id'] = $user->id;
+            RolesUser::upsert($rolesData, ['user_id', 'role_id']);
+
+            DB::commit();
+        } catch (QueryException $e) {
+            DB::rollback();
+
+            return response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
         }
 
         $token = Auth::fromUser($user);

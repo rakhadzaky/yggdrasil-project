@@ -44,6 +44,7 @@ class FamiliesController extends Controller
 
         return response([
             'success' => true,
+            'inserted_id' => $family->id,
         ], 200);
     }
 
