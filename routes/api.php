@@ -34,6 +34,7 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::get('/family/persons/{pid}', [PersonsController::class, 'FetchFamilyByPersonId'])->name('family_list');
 Route::get('/person/detail/{pid}', [PersonsController::class, 'getDetailPersonByPID'])->name('detail_person');
+Route::post('/admin/new/family-person', [PersonsController::class, 'AddNewFamilyAndPerson'])->name('admin_new_family_person');
 
 Route::post('/person/search', [AuthController::class, 'CheckPersonLogName'])->name('search_person');
 

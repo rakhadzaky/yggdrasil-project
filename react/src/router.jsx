@@ -9,6 +9,7 @@ import AdminPersonEdit from "./pages/Admin/PersonEdit/view"
 import AdminHeadFamilyList from "./pages/Admin/HeadFamilyLists/view"
 import AdminRelationForm from "./pages/Admin/PersonRelation/view"
 import JoinReferral from "./pages/JoinReferral/view"
+import CreateNewFamily from "./pages/CreateNewFamily/view"
 
 const router = createBrowserRouter([
     {
@@ -29,7 +30,11 @@ const router = createBrowserRouter([
             {
                 path:'referral',
                 element: <JoinReferral />
-            }
+            },
+            {
+                path: 'create-new',
+                element: <CreateNewFamily />
+            },
         ]
     },
     {

@@ -10,10 +10,14 @@ export const PERSON_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person`
 export const PERSON_DETAIL_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person`
 export const PERSON_UPDATE_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person/update`
 export const HEAD_FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/headfamily`
-export const PERSON_FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family/list`
-export const FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family`
 export const ASSIGN_PERSON_RELATION_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person/relation/add`
 export const PERSON_DELETE_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person/delete`
+export const NEW_FAMILY_PERSON_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/new/family-person`
+
+export const PERSON_FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family/list`
+export const FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family`
+export const FAMILY_CREATE_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family/create`
+export const FAMILY_ASSIGN_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family/assign`
 
 export const ADMIN_SEARCH_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/search`
 export const ADMIN_INVALIDATE_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/invalidate`

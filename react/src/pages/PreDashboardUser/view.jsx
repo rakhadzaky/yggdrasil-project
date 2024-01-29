@@ -26,6 +26,7 @@ const PreDashboardUser = () => {
                 <Col span={4} offset={6}>
                     <Card
                         hoverable
+                        onClick={() => navigate("/pre/create-new")}
                         cover={<img alt="create_new_family" style={{height: 256}} src="http://localhost:8000/storage/assets/undraw_selecting_team_re_ndkb.svg" />}
                     >
                         <Meta title="I'll fill my data" description="Fill your data and create your new family" />
