@@ -7,10 +7,12 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 use App\Models\ReferralLog;
 use App\Models\Persons;
+use App\Mail\MailService;
 
 class ReferralController extends Controller
 {
@@ -43,6 +45,13 @@ class ReferralController extends Controller
         $referral->created_by_email = $userData["user"]["email"];
         try {
             $referral->save();
+
+            $mailContent = [
+                'sender' => $userData["user"]["name"],
+                'referral_code' => $referral->referral_code,
+                'expired_time' => $referral->expired_time,
+            ];
+            Mail::to($request->sent_to_email)->send(new MailService($mailContent));
         } catch (QueryException $e) {
             return response([
                 'success' => false,
