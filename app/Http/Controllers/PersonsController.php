@@ -233,8 +233,15 @@ class PersonsController extends Controller
         $relations = PersonRelations::where('mid', $mid)->where('fid', $fid)->get();
         foreach ($relations as $relation) {
             $person = Persons::find($relation->pid);
+            if ($person == null) {
+                continue;
+            }
 
-            $imgProfile = $person->img_url;
+            $imgProfile = URL::to('/').'/dummy-profile.png';
+
+            if ($person->img_url != null) {
+                $imgProfile = $person->img_url;
+            }
             if ($person->img_file != null) {
                 $imgProfile = URL::to('/').'/'.$person->img_file;
             }

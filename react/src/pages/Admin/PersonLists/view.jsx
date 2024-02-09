@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Space, Table, Row, Col, Spin, Button, Breadcrumb, Input, Tag, Select, App, Popconfirm } from 'antd';
+import { Space, Table, Row, Col, Spin, Button, Breadcrumb, Input, Tag, Select, App, Dropdown, Modal } from 'antd';
+import { DownOutlined, ExclamationCircleFilled } from '@ant-design/icons';
 import CompleteLayout from "../Layout/CompleteLayout"
 
 import { useQuery } from "react-query";
 
-import {PERSON_LIST_ADMIN_API, PERSON_FAMILY_LIST_ADMIN_API, PERSON_DELETE_ADMIN_API} from "@api";
+import {PERSON_LIST_ADMIN_API, PERSON_FAMILY_LIST_ADMIN_API, PERSON_DELETE_ADMIN_API, ADMIN_CREATE_REFERRAL_API} from "@api";
 
 import { MutationFetch, MutationSubmit } from '../../Helpers/mutation'
 import useHandleError from '../../Helpers/handleError'
@@ -23,8 +24,15 @@ const AdminPersonList = () => {
     const [familyId, setFamilyId] = useState();
     const [tableLoading, setTableLoading] = useState(false);
     const [initiateLoading, setInitiateLoading] = useState(true);
+    const [isModalReferralOpen, setIsModalReferralOpen] = useState(false);
+    const [referralRequest, setReferralRequest] = useState({
+        submited_person_id: 0,
+        sent_to_email: "",
+    });
+
     const { handleError } = useHandleError();
     const { message } = App.useApp()
+    const { confirm } = Modal;
 
     const userData = HandleGetCookies("userData", true);
     const userPID = userData.person_id;
@@ -101,8 +109,93 @@ const AdminPersonList = () => {
             });
     }
 
-    const confirm = (e, index) => {
-        handleDeletePerson(index.id)
+    const handleSendReferral = () => {
+        setTableLoading(true)
+
+        // validate data, must exists
+        if (referralRequest.submited_person_id == 0) {
+            message.open({
+                type: 'error',
+                content: 'No person data selected',
+            })
+        }
+        if (referralRequest.sent_to_email == "") {
+            message.open({
+                type: 'error',
+                content: 'No email inserted',
+            })
+        }
+
+        MutationSubmit('post', `${ADMIN_CREATE_REFERRAL_API}`, referralRequest, false)
+            .then(() => {
+                message.open({
+                    type: 'success',
+                    content: 'Email sent',
+                    duration: 2,
+                })
+                setTableLoading(false)
+                refetch
+            })
+            .catch(error => {
+                setTableLoading(false)
+                handleError(error)
+            });
+    }
+
+    const handleOpenModalDelete = (e, index) => {
+        confirm({
+            title: 'Are you sure to delete this person?',
+            icon: <ExclamationCircleFilled />,
+            content: 'It will delete for good',
+            onOk() {
+                handleDeletePerson(index)
+            },
+        });
+    }
+
+    const handleCancelModalReferral = () => {
+        setReferralRequest(
+            {
+                submited_person_id: 0,
+                sent_to_email: "",
+            }
+        )
+        setIsModalReferralOpen(false);
+    }
+
+    const handleSubmitModalReferral = () => {
+        handleSendReferral();
+        setIsModalReferralOpen(false);
+    }
+
+    const handleOnChangeEmailReferral = (e) => {
+        // referralRequest.sent_to_email = e.target.value;
+        setReferralRequest({
+            ...referralRequest,
+            sent_to_email: e.target.value
+        })
+    }
+
+    const handleDropdownItemClick = (e) => {
+        const keySplit = e.key.split("-");
+        switch (keySplit[0]) {
+            case 'update_relation':
+                window.location.href = `${BASE_URL}/admin/person/relation/${keySplit[1]}`;
+                break;
+            case 'edit_person':
+                window.location.href = `${BASE_URL}/admin/person/edit/${keySplit[1]}`;
+                break;
+            case 'send_referral_code':
+                setIsModalReferralOpen(true);
+                referralRequest.submited_person_id = keySplit[1];
+                break;
+            case 'delete_person':
+                handleOpenModalDelete(e, keySplit[1])
+                break;
+        
+            default:
+                break;
+        }
     };
 
     const columns = [
@@ -144,23 +237,58 @@ const AdminPersonList = () => {
             },
         },
         {
+            title: 'User',
+            dataIndex: 'user_id',
+            key: 'user_id',
+            render: (record, index) => {
+                if (index.user_id !== null) {
+                    return(
+                        <Tag color="success">Connected to User</Tag>
+                    )
+                } else {
+                    return(
+                        <Tag color="error">Not Connected to User</Tag>
+                    )
+                }
+            },
+        },
+        {
             title: 'Action',
             key: 'action',
             fixed: 'right',
             render: (record, index) => {
+                const items = [
+                    {
+                        key: `update_relation-${index.id}`,
+                        label: 'Update Relation',
+                    },
+                    {
+                        key: `edit_person-${index.id}`,
+                        label: 'Edit Person',
+                    },
+                    {
+                        key: `send_referral_code-${index.id}`,
+                        label: 'Send Referral Code',
+                        disabled: index.user_id != null,
+                    },
+                    {
+                        key: `delete_person-${index.id}`,
+                        label: 'Delete Person',
+                    },
+                ];
                 return(
                     <Space>
-                        <Button type='primary' href={`${BASE_URL}/admin/person/relation/${index.id}`} ghost>Update Relation</Button>
-                        <Button type='primary' href={`${BASE_URL}/admin/person/edit/${index.id}`} ghost>Edit</Button>
-                        <Popconfirm
-                            title="Delete Person"
-                            description="Are you sure to delete this person?"
-                            onConfirm={(e) => confirm(e, index)}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <Button danger>Delete</Button>
-                        </Popconfirm>
+                        <Dropdown
+                            trigger={['click']}
+                            menu={{
+                                onClick: handleDropdownItemClick,
+                                items
+                            }}
+                            >
+                            <a style={{'textDecoration' : 'none', 'color' : '#808080'}}>
+                                Action <DownOutlined />
+                            </a>
+                        </Dropdown>
                     </Space>
                 )
             }
@@ -224,6 +352,21 @@ const AdminPersonList = () => {
                 size="middle"
                 scroll={{ x: 'calc(700px + 50%)' }}
             />
+            <Modal
+                title="Send Referral Code" 
+                open={isModalReferralOpen} 
+                footer={null}
+            >
+                <Input placeholder="Email Receiver (ex. someone@example.com)" onChange={handleOnChangeEmailReferral} value={referralRequest.sent_to_email}/>
+                <Space style={{"marginTop": "16px"}}>
+                    <Button type="link" htmlType="button" onClick={handleCancelModalReferral}>
+                        Cancel
+                    </Button>
+                    <Button type="primary" onClick={handleSubmitModalReferral}>
+                        Send Email
+                    </Button>
+                </Space>
+            </Modal>
         </CompleteLayout>
     )
 };
