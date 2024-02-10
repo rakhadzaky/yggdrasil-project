@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SuperAdminPersonController;
 use App\Http\Controllers\FamiliesController;
 use App\Http\Controllers\ReferralController;
+use App\Http\Controllers\GuestsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,3 +59,6 @@ Route::get('/admin/family', [FamiliesController::class, "FetchAllFamily"])->name
 Route::post('/admin/referral/create', [ReferralController::class, "CreateReferral"])->name('admin_create_referral');
 Route::get('/admin/referral/search/{referral_code}', [ReferralController::class, "SearchReferralCode"])->name('admin_search_referral');
 Route::post('/admin/referral/invalidate', [ReferralController::class, "InvalidateUsedReferralCode"])->name('admin_invalidate_referral');
+
+// GuestAccessController
+Route::get('guest/family/person/{guest_code}', [GuestsController::class, "GuestFetchFamily"])->name('guest_family_list');
