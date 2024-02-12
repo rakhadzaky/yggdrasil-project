@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Persons;
-use App\Models\PersonRelations;
-use App\Models\Families;
-use App\Models\FamilyRelations;
 use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
+use App\Models\Persons;
+use App\Models\PersonRelations;
+use App\Models\Families;
+use App\Models\FamilyRelations;
+use App\Models\PersonPhotos;
+
+use Carbon\Carbon;
 use Image;
 use DateTime;
 
@@ -489,6 +490,90 @@ class SuperAdminPersonController extends Controller
         } catch (QueryException $e) {
             DB::rollback();
 
+            return response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response([
+            'success' => true,
+        ], 200);
+    }
+
+    public function AddNewPersonPhotos(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'pid' => 'required|exists:persons,id',
+            "img_address"    => "required|array",
+            'img_address.*' => 'required|regex:/^[a-zA-Z]+\/.*/',
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        // prepare data
+        $photoListData = [];
+
+        foreach ($request->img_address as $key => $img_address) {
+            array_push($photoListData, [
+                'pid' => $request->pid,
+                'img_address' => $img_address,
+                'is_main_image' => false,
+            ]);
+        }
+
+        if (count($photoListData) <= 0) {
+            return response([
+                'success' => false,
+                'message' => 'No Image to Upload',
+                'data' => null
+            ], 400);
+        }
+
+        try {
+            PersonPhotos::insert($photoListData);
+        } catch (QueryException $e) {
+            return response([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+        return response([
+            'success' => true,
+        ], 200);
+    }
+
+    public function SetMainPersonPhoto(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'pid' => 'required|exists:persons,id',
+            'photos_id' => 'required|exists:person_photos,id',
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        // get photo detail data
+        $photo = PersonPhotos::find($request->photos_id);
+        if ($photo == null) {
+            return response([
+                'success' => false,
+                'message' => 'Photo not found',
+                'data' => null
+            ], 404);
+        }
+        $photo->is_main_image = true;
+
+        try {
+            PersonPhotos::where('pid', $request->pid)->update(['is_main_image' => false]);
+            $photo->save();
+        } catch (QueryException $e) {
             return response([
                 'success' => false,
                 'message' => $e->getMessage(),

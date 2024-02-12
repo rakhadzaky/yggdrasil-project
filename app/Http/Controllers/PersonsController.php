@@ -9,6 +9,7 @@ use App\Models\Families;
 use App\Models\FamilyRelations;
 use App\Models\Roles;
 use App\Models\RolesUser;
+use App\Models\PersonPhotos;
 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
@@ -461,6 +462,32 @@ class PersonsController extends Controller
         return response([
             'success' => true,
             'inserted_id' => $insertPerson->id,
+        ], 200);
+    }
+
+    public function FetchPersonPhotos($pid) {
+        $validator = Validator::make(['pid' => $pid], [
+            'pid' => 'required|exists:persons,id',
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        $photos = PersonPhotos::where('pid', $pid)->get();
+        if ($photos == null) {
+            return response([
+                'success' => false,
+                'message' => 'No photo data found, please insert it first',
+                'data' => null,
+            ], 404);
+        }
+
+        return response([
+            'success' => true,
+            'data' => $photos,
         ], 200);
     }
 }

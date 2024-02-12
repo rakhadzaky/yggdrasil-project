@@ -36,6 +36,7 @@ Route::controller(AuthController::class)->group(function () {
 
 Route::get('/family/persons/{pid}', [PersonsController::class, 'FetchFamilyByPersonId'])->name('family_list');
 Route::get('/person/detail/{pid}', [PersonsController::class, 'getDetailPersonByPID'])->name('detail_person');
+Route::get('/person/photos/list/{pid}', [PersonsController::class, 'FetchPersonPhotos'])->name('person_photos_list');
 Route::post('/admin/new/family-person', [PersonsController::class, 'AddNewFamilyAndPerson'])->name('admin_new_family_person');
 
 Route::post('/person/search', [AuthController::class, 'CheckPersonLogName'])->name('search_person');
@@ -49,6 +50,8 @@ Route::post('/admin/person/delete', [SuperAdminPersonController::class, 'DeleteP
 Route::post('/admin/person/update/{pid}', [SuperAdminPersonController::class, 'UpdatePerson'])->name('admin_update_person');
 Route::get('/admin/family/list/{pid}', [SuperAdminPersonController::class, 'GetFamilyList'])->name('admin_get_family_list');
 Route::post('/admin/person/relation/add', [SuperAdminPersonController::class, 'AssignPersonRelation'])->name('admin_assign_person_relation');
+Route::post('/admin/person/photos/add', [SuperAdminPersonController::class, 'AddNewPersonPhotos'])->name('admin_add_person_photos');
+Route::post('/admin/person/photos/set-main', [SuperAdminPersonController::class, 'SetMainPersonPhoto'])->name('admin_set_main_person_photos');
 
 // AdminFamilyController
 Route::post('/admin/family/create', [FamiliesController::class, "CreateFamily"])->name('admin_create_family');
