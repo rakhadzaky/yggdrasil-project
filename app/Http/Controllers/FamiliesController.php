@@ -319,16 +319,6 @@ class FamiliesController extends Controller
             ], 400);
         }
 
-        // check gallery id
-        $gallery = Galleries::find($request->gallery_id);
-        if ($gallery == null) {
-            return response([
-                'success' => false,
-                'message' => 'Gallery not found',
-                'data' => null
-            ], 404);
-        }
-
         // prepare data
         $photoListData = [];
 
