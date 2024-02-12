@@ -9,6 +9,7 @@ use App\Http\Controllers\SuperAdminPersonController;
 use App\Http\Controllers\FamiliesController;
 use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\GuestsController;
+use App\Http\Controllers\ImageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +56,13 @@ Route::post('/admin/family/assign', [FamiliesController::class, "AssignFamily"])
 Route::get('/admin/family/members/{fid}', [FamiliesController::class, "FetchAllFamilyMember"])->name('admin_fetch_family_member');
 Route::get('/admin/family', [FamiliesController::class, "FetchAllFamily"])->name('admin_fetch_family_list');
 
+// Galleries
+Route::get('/gallery/list/{fid}', [FamiliesController::class, "FetchFamilyGalleries"])->name('fetch_gallery_by_family_id');
+Route::get('/gallery/detail/{gid}', [FamiliesController::class, "FetchFamilyGalleryDetail"])->name('fetch_gallery_detail');
+Route::post('/gallery/store', [FamiliesController::class, "CreateNewGallery"])->name('create_gallery');
+Route::post('gallery/update/{gid}', [FamiliesController::class, "UpdateGallery"])->name('update_gallery');
+Route::post('gallery/photos/add', [FamiliesController::class, "AddNewPhotosToGallery"])->name('add_photo_to_gallery');
+
 // ReferralController
 Route::post('/admin/referral/create', [ReferralController::class, "CreateReferral"])->name('admin_create_referral');
 Route::get('/admin/referral/search/{referral_code}', [ReferralController::class, "SearchReferralCode"])->name('admin_search_referral');
@@ -62,3 +70,6 @@ Route::post('/admin/referral/invalidate', [ReferralController::class, "Invalidat
 
 // GuestAccessController
 Route::get('guest/family/person/{guest_code}', [GuestsController::class, "GuestFetchFamily"])->name('guest_family_list');
+
+// PhotoController
+Route::post('/photo/upload', [ImageController::class, "UploadPhotoToStore"])->name('upload_photo');
