@@ -203,7 +203,6 @@ class SuperAdminPersonController extends Controller
             'name' => 'required|regex:/^[a-z\d\-_\s]+$/i',
             'gender' => 'required|alpha',
             'birthdate' => 'required|date',
-            'img_url' => 'url:http,https',
             'img_file' => 'mimes:jpg,jpeg,bmp,png',
             'live_loc' => 'regex:/^[a-z\d\-_\s]+$/i|nullable',
             'phone' => 'numeric|nullable'
@@ -261,12 +260,21 @@ class SuperAdminPersonController extends Controller
             "family_id" => $request->family_id,
         ];
 
+        // prepare data for person photos list
+        $insertPersonPhotos = new PersonPhotos;
+        $insertPersonPhotos->img_address = $imgData;
+        $insertPersonPhotos->is_main_image = true;
+
         // store and save data using transaction
         DB::beginTransaction();
         try {
             $insertPerson->save();
+            
             $familyRelationsData["person_id"] = $insertPerson->id;
             FamilyRelations::create($familyRelationsData);
+            
+            $insertPersonPhotos->pid = $insertPerson->id;
+            $insertPerson->save();
 
             DB::commit();
         } catch (QueryException $e) {
@@ -320,7 +328,6 @@ class SuperAdminPersonController extends Controller
             'name' => 'required|regex:/^[a-z\d\-_\s]+$/i',
             'gender' => 'required|alpha',
             'birthdate' => 'required|date',
-            'img_url' => 'url:http,https',
             'img_file' => 'mimes:jpg,jpeg,bmp,png|nullable',
             'live_loc' => 'regex:/^[a-z\d\-_\s]+$/i|nullable',
             'phone' => 'numeric|nullable'
@@ -361,6 +368,7 @@ class SuperAdminPersonController extends Controller
             $imgData = 'storage/'.$imgFileName;
         }
 
+        // prepare data for update person data
         $insertPerson->name = $request->input('name');
         $insertPerson->gender = $request->input('gender');
         $insertPerson->birthdate = $request->input('birthdate');
@@ -373,8 +381,24 @@ class SuperAdminPersonController extends Controller
             $insertPerson->img_url = $request->input('img_url');
         }
 
+        // prepare update all previous person photo list
+        $updatePersonPhotos = PersonPhotos::where('pid', $pid);
+
+        // prepare data for person photos list
+        $insertPersonPhotos = new PersonPhotos;
+        $insertPersonPhotos->img_address = $imgData;
+        $insertPersonPhotos->is_main_image = true;
+        $insertPersonPhotos->pid = $pid;
+
+        // store and save data using transaction
+        DB::beginTransaction();
         try {
             $insertPerson->save();
+
+            $updatePersonPhotos->update(['is_main_image' => 0]);
+            $insertPersonPhotos->save();
+
+            DB::commit();
         } catch (QueryException $e) {
             return response([
                 'success' => false,

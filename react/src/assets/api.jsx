@@ -13,6 +13,12 @@ export const HEAD_FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/headfam
 export const ASSIGN_PERSON_RELATION_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person/relation/add`
 export const PERSON_DELETE_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/person/delete`
 export const NEW_FAMILY_PERSON_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/new/family-person`
+export const ADMIN_GALLERY_LIST = `${BACKEND_BASE_URL}/api/gallery/list`
+export const ADMIN_GALLERY_PHOTOS_LIST = `${BACKEND_BASE_URL}/api/gallery/detail`
+export const ADMIN_PHOTOS_LIST = `${BACKEND_BASE_URL}/api/person/photos/list`
+export const ADMIN_PHOTOS_ADD = `${BACKEND_BASE_URL}/api/gallery/photos/add`
+
+export const ADMIN_UPLOAD_PHOTOS = `${BACKEND_BASE_URL}/api/photo/upload`
 
 export const PERSON_FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family/list`
 export const FAMILY_LIST_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family`

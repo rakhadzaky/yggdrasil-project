@@ -10,6 +10,8 @@ import AdminHeadFamilyList from "./pages/Admin/HeadFamilyLists/view"
 import AdminRelationForm from "./pages/Admin/PersonRelation/view"
 import JoinReferral from "./pages/JoinReferral/view"
 import CreateNewFamily from "./pages/CreateNewFamily/view"
+import FamilyGallery from "./pages/Admin/FamilyGallery/view"
+import FamilyGalleryDetail from "./pages/Admin/FamilyGalleryDetail/view"
 
 const router = createBrowserRouter([
     {
@@ -63,6 +65,14 @@ const router = createBrowserRouter([
             {
                 path: 'person/relation/:pid',
                 element: <AdminRelationForm />
+            },
+            {
+                path: 'gallery/list',
+                element: <FamilyGallery />
+            },
+            {
+                path: 'gallery/detail/:gid',
+                element: <FamilyGalleryDetail />
             }
         ]
     }

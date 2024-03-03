@@ -20,7 +20,8 @@ class ImageController extends Controller
     }
     public function UploadPhotoToStore(Request $request) {
         $validator = Validator::make($request->all(), [
-            'img_file' => 'mimes:jpg,jpeg,bmp,png',
+            'img_file' => 'required|array',
+            'img_file.*' => 'mimes:jpg,jpeg,bmp,png',
             'photo_type' => [
                 'required',
                 Rule::in(['gallery', 'profile'])
@@ -36,34 +37,38 @@ class ImageController extends Controller
         $jwtToken = explode(' ', $request->header('Authorization'))[1];
         $userData = Auth::payload($jwtToken)->toArray();
 
-        // get image
-        $imgFile = $request->file('img_file');
-        $img = Image::make($imgFile->getRealPath());
-        $img->resize(720, 720, function ($constraint) {
-            $constraint->aspectRatio();                 
-        });
-        
-        // rename image
-        $date = new DateTime();
-        $dateStr = $date->format('YmdHis');
-        $imgFileName = $request->photo_type.'/'.$userData["user"]["person"]["id"].'-'.$dateStr.'.'.$imgFile->getClientOriginalExtension();
+        $imgDataList = [];
+        foreach ($request->file('img_file') as $key => $image) {
+            // get image
+            $imgFile = $image;
+            $img = Image::make($imgFile->getRealPath());
+            $img->resize(720, 720, function ($constraint) {
+                $constraint->aspectRatio();                 
+            });
+            
+            // rename image
+            $date = new DateTime();
+            $dateStr = $date->format('YmdHis');
+            $imgFileName = $request->photo_type.'/'.$userData["user"]["person"]["id"].'-'.$dateStr.$key.'.'.$imgFile->getClientOriginalExtension();
 
-        // store
-        $img->stream();
-        try {
-            Storage::disk('local')->put('public/'.$imgFileName, $img, 'public');
-        } catch (QueryException $e) {
-            return response([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            // store
+            $img->stream();
+            try {
+                Storage::disk('local')->put('public/'.$imgFileName, $img, 'public');
+            } catch (QueryException $e) {
+                return response([
+                    'success' => false,
+                    'message' => $e->getMessage(),
+                ], 500);
+            }
+
+            $imgData = 'storage/'.$imgFileName;
+            $imgDataList[$key] = $imgData;
         }
-
-        $imgData = 'storage/'.$imgFileName;
 
         return response([
             'success' => true,
-            'image_location' => $imgData
+            'image_location' => $imgDataList
         ], 200);
     }
 }

@@ -1,4 +1,4 @@
-import {UserOutlined, SettingOutlined} from '@ant-design/icons';
+import {UserOutlined, SettingOutlined, HomeOutlined} from '@ant-design/icons';
 import {Menu, App} from 'antd';
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
@@ -32,6 +32,18 @@ const items = [
             ),
             key: 'head_of_family_list',
         },
+    ]),{
+        type: 'divider'
+    },
+    getItem('Families', 'sub2', <HomeOutlined />, [
+        {
+            label: (
+                <a href={`${BASE_URL}/admin/gallery/list`} style={{textDecoration: "none"}} rel="noopener noreferrer">
+                    Gallery List
+                </a>
+            ),
+            key: 'gallery_list',
+        },        
     ]),{
         type: 'divider'
     },

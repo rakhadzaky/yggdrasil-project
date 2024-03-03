@@ -5,7 +5,6 @@ import {
     Form,
     Input,
     Radio,
-    Switch,
     Upload,
     Divider,
     Select,
@@ -25,14 +24,9 @@ const normFile = (e) => {
 };
 const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validationPersonMessage}) => {
     const [form] = Form.useForm();
-    const [ isUseImageFile, setIsUseImageFile ] = useState(false);
     const [familyList, setFamilyList] = useState()
     const userData = HandleGetCookies("userData", true);
     const userPID = userData.person_id;
-
-    const handleChangeSwitchImage = (checked) => {
-        setIsUseImageFile(checked)
-    }
 
     const handleSubmit = (values) => {
         Object.keys(values).map((field_name) => {
@@ -131,27 +125,18 @@ const FormCreatePerson = ({handleOnFinishForm, handleUpload, isLoading, validati
             <Form.Item label="Birthdate" name="birthdate" rules={[{ required: true, message: 'Please enter the person birthdate' }]}>
                 <DatePicker />
             </Form.Item>
-            <Form.Item label="Use Image File" name="switchImage" valuePropName="checked">
-                <Switch value={isUseImageFile} onChange={handleChangeSwitchImage} />
+            <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
+                <Upload
+                    listType="picture-card"
+                    onChange={handleUpload}
+                    onPreview={onPreview}
+                    beforeUpload={() => false} 
+                    maxCount={1}
+                    accept="image/png, image/jpeg"
+                >
+                    {'+ Upload'}
+                </Upload>
             </Form.Item>
-            {isUseImageFile ? (
-                <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
-                    <Upload
-                        listType="picture-card"
-                        onChange={handleUpload}
-                        onPreview={onPreview}
-                        beforeUpload={() => false} 
-                        maxCount={1}
-                        accept="image/png, image/jpeg"
-                    >
-                        {'+ Upload'}
-                    </Upload>
-                </Form.Item>
-            ) : (
-                <Form.Item label="Image URL" name="img_url">
-                    <Input />
-                </Form.Item>
-            )}
             <Form.Item label="Residence Location" name="live_loc">
                 <TextArea />
             </Form.Item>
