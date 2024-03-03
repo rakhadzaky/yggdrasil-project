@@ -56,13 +56,9 @@ function AdminPersonEdit() {
         if (values.phone !== undefined) {
             formData.append("phone", values.phone);   
         }
-        if (!values.switchImage) {
-            formData.append("img_url", values.img_url);
-        } else {
-            if (fileList.length > 0) {
-                if (fileList[0].originFileObj !== undefined) {
-                    formData.append("img_file", fileList[0].originFileObj);      
-                }
+        if (fileList.length > 0) {
+            if (fileList[0].originFileObj !== undefined) {
+                formData.append("img_file", fileList[0].originFileObj);      
             }
         }
 

@@ -14,6 +14,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 
+use DB;
+
 class FamiliesController extends Controller
 {
     public function __construct()
@@ -139,7 +141,7 @@ class FamiliesController extends Controller
             ], 404);
         }
 
-        $galleries = Galleries::where('family_id', $family->id)->get();
+        $galleries = DB::table('galleries')->leftJoin('photos', 'galleries.id', '=', 'photos.gallery_id')->select('galleries.*', DB::raw('count(photos.id) as photos_count'))->where('family_id', $family->id)->groupBy('galleries.id')->get();
         if ($galleries == null) {
             return response([
                 'success' => true,
@@ -298,6 +300,10 @@ class FamiliesController extends Controller
                 'data' => null
             ], 404);
         }
+
+        $photos = Photos::where('gallery_id', $gallery->id)->get();
+        
+        $gallery['photos'] = $photos;
 
         return response([
             'success' => true,

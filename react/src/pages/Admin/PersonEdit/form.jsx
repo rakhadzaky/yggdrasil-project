@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
     Button,
     DatePicker,
     Form,
     Input,
     Radio,
-    Switch,
     Upload,
 } from 'antd';
 import PropTypes from 'prop-types';
@@ -20,11 +19,6 @@ const normFile = (e) => {
 };
 const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoading, fileList, validationMessage}) => {
     const [form] = Form.useForm();
-    const [ isUseImageFile, setIsUseImageFile ] = useState(personData.img_file !== null);
-
-    const handleChangeSwitchImage = (checked) => {
-        setIsUseImageFile(checked)
-    }
 
     const onPreview = async (file) => {
         let src = file.url;
@@ -82,8 +76,6 @@ const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoadi
             initialValues={{
                 name: personData.name,
                 gender: personData.gender,
-                switchImage: isUseImageFile,
-                img_url: personData.img_url,
                 live_loc: personData.live_loc || "",
                 phone: personData.phone,
                 birthdate: dayjs(personData.birthdate),
@@ -101,28 +93,19 @@ const FormCreatePerson = ({personData, handleOnFinishForm, handleUpload, isLoadi
             <Form.Item label="Birthdate" name="birthdate" rules={[{ required: true, message: 'Please enter the person birthdate' }]}>
                 <DatePicker />
             </Form.Item>
-            <Form.Item label="Use Image File" name="switchImage" valuePropName="checked">
-                <Switch value={isUseImageFile} onChange={handleChangeSwitchImage} />
+            <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
+                <Upload
+                    listType="picture-card"
+                    onChange={handleUpload}
+                    onPreview={onPreview}
+                    beforeUpload={() => false} 
+                    maxCount={1}
+                    accept="image/png, image/jpeg"
+                    fileList={fileList}
+                >
+                    {'+ Upload'}
+                </Upload>
             </Form.Item>
-            {isUseImageFile ? (
-                <Form.Item label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
-                    <Upload
-                        listType="picture-card"
-                        onChange={handleUpload}
-                        onPreview={onPreview}
-                        beforeUpload={() => false} 
-                        maxCount={1}
-                        accept="image/png, image/jpeg"
-                        fileList={fileList}
-                    >
-                        {'+ Upload'}
-                    </Upload>
-                </Form.Item>
-            ) : (
-                <Form.Item label="Image URL" name="img_url">
-                    <Input />
-                </Form.Item>
-            )}
             <Form.Item label="Residence Location" name="live_loc">
                 <TextArea />
             </Form.Item>

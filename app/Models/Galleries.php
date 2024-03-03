@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Models\Photos;
+
 class Galleries extends Model
 {
     use HasFactory;
@@ -18,4 +20,8 @@ class Galleries extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function photos(){
+        return $this->hasMany(Photos::class, 'gallery_id', 'id');
+    }
 }

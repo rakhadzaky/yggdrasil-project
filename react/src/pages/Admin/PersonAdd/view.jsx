@@ -62,12 +62,8 @@ function AdminPersonAdd() {
         if (values.phone !== undefined) {
             formData.append("phone", values.phone);   
         }
-        if (!values.switchImage) {
-            formData.append("img_url", values.img_url);
-        } else {
-            if (fileList.length > 0) {
-                formData.append("img_file", fileList[0].originFileObj);   
-            }
+        if (fileList.length > 0) {
+            formData.append("img_file", fileList[0].originFileObj);   
         }
 
         MutationSubmit('post', `${PERSON_DETAIL_ADMIN_API}`, formData, true)

@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Descriptions, Image, Divider, Row, Col, Spin, Breadcrumb, Typography, Card, Empty  } from 'antd';
+import { Descriptions, Image, Divider, Row, Col, Spin, Breadcrumb, Typography, Card, Empty, Space } from 'antd';
 import { HomeOutlined, FileSearchOutlined } from '@ant-design/icons';
 import HeaderBar from "../Layout/header"
 import FooterBar from "../Layout/footer"
 import {useParams} from "react-router-dom";
-import { BACKEND_BASE_URL, PERSON_DETAIL_API } from '@api';
+import { BACKEND_BASE_URL, PERSON_DETAIL_API, ADMIN_PHOTOS_LIST } from '@api';
 import useHandleError from '../Helpers/handleError'
 
 import { MutationFetch } from '../Helpers/mutation'
 
 const DetailPerson = () => {
     const [person, setPerson] = useState({});
+    const [personPhoto, setPersonPhoto] = useState([]);
     const [family, setFamily] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const { Title } = Typography
@@ -27,6 +28,14 @@ const DetailPerson = () => {
                     setFamily(response.data.data.family);   
                 }
                 setIsLoading(false);
+            })
+            .catch(error => {
+                handleError(error);
+            });
+
+        MutationFetch(`${ADMIN_PHOTOS_LIST}/${pid}`)
+            .then(response => {
+                setPersonPhoto(response.data.data);
             })
             .catch(error => {
                 handleError(error);
@@ -77,6 +86,24 @@ const DetailPerson = () => {
                     src={person.img_url}
                 />
             )}
+            <div style={{margin:"10px"}}></div>
+            <Image.PreviewGroup
+                preview={{
+                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                }}
+            >
+                <Space size={[16, 16]} wrap>
+                    {
+                        Object.keys(personPhoto).map((id) => {
+                            return(
+                                <>
+                                    <Image width={100} src={`${BACKEND_BASE_URL}/${personPhoto[id].img_address}`} />
+                                </>
+                            )
+                        })
+                    }
+                </Space>
+            </Image.PreviewGroup>
             <Divider orientation="left">
                 Biodata
             </Divider>

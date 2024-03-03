@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Col, Row, Typography, Steps, Breadcrumb, Empty, Button, App } from 'antd';
 import { HomeOutlined } from '@ant-design/icons';
-import { MutationFetch, MutationSubmit, HandleGetCookies } from '../Helpers/mutation'
+import { MutationSubmit, HandleGetCookies } from '../Helpers/mutation'
 import Cookies from 'js-cookie';
-import { useNavigate } from "react-router-dom";
 
 import useHandleError from '../Helpers/handleError'
 import HeaderBar from "../Layout/header"
@@ -29,7 +28,6 @@ const CreateNewFamily = () => {
     const [personData, setPersonData] = useState();
     
     const { handleError } = useHandleError();
-    const navigate = useNavigate();
     const { message } = App.useApp()
 
     const changeStep = (value) => {
@@ -68,13 +66,9 @@ const CreateNewFamily = () => {
         if (personData.phone !== undefined) {
             formData.append("phone", personData.phone);   
         }
-        if (!personData.switchImage) {
-            formData.append("img_url", personData.img_url);
-        } else {
-            if (fileList.length > 0) {
-                if (fileList[0].originFileObj !== undefined) {
-                    formData.append("img_file", fileList[0].originFileObj);      
-                }
+        if (fileList.length > 0) {
+            if (fileList[0].originFileObj !== undefined) {
+                formData.append("img_file", fileList[0].originFileObj);      
             }
         }
 
