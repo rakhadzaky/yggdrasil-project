@@ -12,6 +12,7 @@ import JoinReferral from "./pages/JoinReferral/view"
 import CreateNewFamily from "./pages/CreateNewFamily/view"
 import FamilyGallery from "./pages/Admin/FamilyGallery/view"
 import FamilyGalleryDetail from "./pages/Admin/FamilyGalleryDetail/view"
+import GuestFamilyTree from "./pages/Guest/FamilyTree/view"
 
 const router = createBrowserRouter([
     {
@@ -73,6 +74,15 @@ const router = createBrowserRouter([
             {
                 path: 'gallery/detail/:gid',
                 element: <FamilyGalleryDetail />
+            }
+        ]
+    },
+    {
+        path: '/guest',
+        children: [
+            {
+                path: 'person/family-tree',
+                element: <GuestFamilyTree />
             }
         ]
     }

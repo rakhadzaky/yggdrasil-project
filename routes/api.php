@@ -73,6 +73,7 @@ Route::post('/admin/referral/invalidate', [ReferralController::class, "Invalidat
 
 // GuestAccessController
 Route::get('guest/family/person/{guest_code}', [GuestsController::class, "GuestFetchFamily"])->name('guest_family_list');
+Route::post('guest/check', [GuestsController::class, "CheckGuestCode"])->name('guest_check_code');
 
 // PhotoController
 Route::post('/photo/upload', [ImageController::class, "UploadPhotoToStore"])->name('upload_photo');

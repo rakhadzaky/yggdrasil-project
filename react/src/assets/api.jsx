@@ -28,3 +28,7 @@ export const FAMILY_ASSIGN_ADMIN_API = `${BACKEND_BASE_URL}/api/admin/family/ass
 export const ADMIN_SEARCH_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/search`
 export const ADMIN_INVALIDATE_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/invalidate`
 export const ADMIN_CREATE_REFERRAL_API = `${BACKEND_BASE_URL}/api/admin/referral/create`
+
+// API for Guest
+export const GUEST_FAMILY_LIST_API = `${BACKEND_BASE_URL}/api/guest/family/person`
+export const GUEST_CHECK = `${BACKEND_BASE_URL}/api/guest/check`

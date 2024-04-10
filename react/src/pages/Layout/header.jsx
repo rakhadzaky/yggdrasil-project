@@ -1,4 +1,4 @@
-import { HomeOutlined, LogoutOutlined, UserOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { HomeOutlined, LogoutOutlined, UserOutlined, AppstoreOutlined, PictureOutlined } from '@ant-design/icons';
 import { Menu, Button, App } from 'antd';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
@@ -17,6 +17,14 @@ let dropDownMenu = [
       </Button>
     ),
     key: 'my_profile'
+  },
+  {
+    label: (
+      <Button type="link" href={`${BASE_URL}/person/${userData.person_id}`} icon={<PictureOutlined style={{verticalAlign: "baseline"}} />} style={{textDecoration: "none", color: "inherit"}} rel="noopener noreferrer">
+        My Gallery
+      </Button>
+    ),
+    key: 'my_gallery'
   },
   {
     label: (
