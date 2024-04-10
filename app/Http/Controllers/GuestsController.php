@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Validator;
+
 use App\Models\GuestAccess;
 
 class GuestsController extends Controller
@@ -31,5 +33,21 @@ class GuestsController extends Controller
         Log::channel('guest_access')->info('GuestFetchFamily', $logData);
 
         return app(PersonsController::class)->FetchFamilyByPersonId($guestLogData->focus_pid);
+    }
+
+    public function CheckGuestCode(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'guest_code' => 'required|exists:guest_access_log,guest_access_code',
+        ]);
+        if ($validator->fails()) {
+            return response([
+                'success' => false,
+                'message' => $validator->messages(),
+            ], 400);
+        }
+
+        return response([
+            'success' => true,
+        ], 200);
     }
 }
