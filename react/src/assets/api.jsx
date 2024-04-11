@@ -1,4 +1,8 @@
-export const BACKEND_BASE_URL = 'http://localhost:8000'
+let BaseURL = 'http://localhost:8000'
+if (import.meta.env.VITE_APP_ENV == "prod") {
+    BaseURL = 'https://api.pohonkeluarga.id'
+}
+export const BACKEND_BASE_URL = BaseURL
 
 export const LOGIN_API = `${BACKEND_BASE_URL}/api/login`
 
