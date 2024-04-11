@@ -27,7 +27,7 @@ const PreDashboardUser = () => {
                     <Card
                         hoverable
                         onClick={() => navigate("/pre/create-new")}
-                        cover={<img alt="create_new_family" style={{height: 256}} src="http://localhost:8000/storage/assets/undraw_selecting_team_re_ndkb.svg" />}
+                        cover={<img alt="create_new_family" style={{height: 256}} src={import.meta.env.VITE_APP_BASE_URL_BACKEND+"/storage/assets/undraw_selecting_team_re_ndkb.svg"} />}
                     >
                         <Meta title="I'll fill my data" description="Fill your data and create your new family" />
                     </Card>
@@ -36,7 +36,7 @@ const PreDashboardUser = () => {
                     <Card
                         hoverable
                         onClick={() => navigate("/pre/referral")}
-                        cover={<img alt="submit_referral_code" style={{height: 256}} src="http://localhost:8000/storage/assets/undraw_referral_re_0aji.svg" />}
+                        cover={<img alt="submit_referral_code" style={{height: 256}} src={import.meta.env.VITE_APP_BASE_URL_BACKEND+"/storage/assets/undraw_referral_re_0aji.svg"} />}
                     >
                         <Meta title="I have my family's referral code" description="Get referral code from your family member and join the party!" />
                     </Card>
